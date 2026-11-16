@@ -806,7 +806,7 @@ const INSIGNIAS_INICIALES = {
       }
       .gs-catalog-card:hover,
       .gs-catalog-card:focus-visible {
-        background: rgba(255, 255, 255, 0.08);
+        background: rgba(0, 0, 0, 0.70);
         border-color: rgba(255, 255, 255, 0.24);
         transform: translateY(-1px);
         outline: none;
