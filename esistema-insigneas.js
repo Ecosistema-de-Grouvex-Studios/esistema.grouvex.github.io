@@ -790,8 +790,8 @@ const INSIGNIAS_INICIALES = {
         .gs-catalog-grid { grid-template-columns: 1fr; }
       }
       .gs-catalog-card {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(0, 0, 0, 0.80);
+        border: 1px solid rgba(255, 255, 255, 0.7);
         border-radius: 14px;
         padding: 12px;
         display: flex;
