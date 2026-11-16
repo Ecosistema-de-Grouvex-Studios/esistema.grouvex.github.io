@@ -437,7 +437,11 @@ const INSIGNIAS_INICIALES = {
         const archivoOriginal = decodeURIComponent(url.pathname.slice(CONFIG.BASE_PATH.length));
         if (!archivoOriginal || archivoOriginal.includes("/")) return null;
 
-        const encontrada = dbIndexada.get(archivoOriginal.toLowerCase());
+        // Ignorar archivos que contengan "banner" o "logo" en su nombre
+        const archivoLower = archivoOriginal.toLowerCase();
+        if (archivoLower.includes("banner") || archivoLower.includes("logo")) return null;
+
+        const encontrada = dbIndexada.get(archivoLower);
         if (encontrada) return encontrada;
 
         return {
