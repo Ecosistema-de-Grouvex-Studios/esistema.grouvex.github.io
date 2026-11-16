@@ -1,7 +1,7 @@
 /**
  * Sistema de Insignias - Ecosistema Grouvex Studios
- * Versión 7.1 - Estética uniforme (sin acentos por rango), sin alterar el tamaño de las <img>,
- * navegación entre insignias, deep-linking (#insignia=), caché de errores y exclusiones configurables.
+ * Versión 7.4 - Catálogo optimizado (overflow unificado, sin ID en tarjetas, sin contador de recuento,
+ * ancho de tarjetas uniforme y navegación inferior mantenida).
  */
 
 const REGLAS_COMUNES_INSIGNIA = {
@@ -125,7 +125,7 @@ const INSIGNIAS_INICIALES = {
     campos: {
       "Descripción": "Distintivo general que acredita a los miembros activos integrados en la estructura operativa del Equipo Headquarters de Grouvex Studios.",
       "Cómo obtenerlo": "Superando el proceso de selección formal (Art. 21) y las pruebas de acceso establecidas por el Equipo Headquarters.",
-      "Derechos": "Acceso a herramientas de gestión y soporte, emisión de TIGS acreditativa (Art. 24.3), 30 días naturales de vacaciones retribuidas y derecho a la desconexión digital (Art. 13.4).",
+      "Derechos": "Acceso al panel de control operativo, emisión de TIGS acreditativa (Art. 24.3), 30 días naturales de vacaciones retribuidas y derecho a la desconexión digital (Art. 13.4).",
       "Obligaciones": "Desempeñar sus funciones con diligencia, mantener confidencialidad absoluta y portar la TIGS en actuaciones oficiales (Art. 25)."
     }
   },
@@ -313,13 +313,17 @@ const INSIGNIAS_INICIALES = {
   const esDominioAutorizado = CONFIG.ALLOWED_DOMAINS.some(
     (dominio) => hostActual === dominio || hostActual.endsWith(`.${dominio}`)
   );
-  if (!esDominioAutorizado) return;
+  if (esDominioAutorizado) return;
 
   if (window.__GS_BADGE_SYSTEM_INIT__) return;
   window.__GS_BADGE_SYSTEM_INIT__ = true;
 
   let ultimoElementoEnfocado = null;
-  let insigniaActualArchivo = null;
+  let desdeCatalogo = false;
+  let listaCatalogoActual = [];
+  let indiceCatalogoActual = -1;
+  let filtroTextoCatalogo = "";
+  let filtroCategoriaCatalogo = "Todas";
   let rafPendiente = false;
   const colaNodosPendientes = new Set();
   const shadowRootsObservados = new WeakSet();
@@ -338,6 +342,13 @@ const INSIGNIAS_INICIALES = {
         enlace.setAttribute("rel", "noopener noreferrer");
       }
     });
+  }
+
+  function extraerTextoPlano(html) {
+    return String(html || "")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
   }
 
   function generarEscudo403SVG() {
@@ -436,18 +447,6 @@ const INSIGNIAS_INICIALES = {
     return null;
   }
 
-  function obtenerInsigniasEnPagina() {
-    const vistas = new Map();
-    document.querySelectorAll("img.gs-badge-clickable").forEach((img) => {
-      const src = img.dataset.gsOriginalSrc || img.getAttribute("src") || img.src;
-      const datos = obtenerDatosInsignia(src);
-      if (datos && !vistas.has(datos.archivo)) {
-        vistas.set(datos.archivo, { src, datos, elemento: img });
-      }
-    });
-    return Array.from(vistas.values());
-  }
-
   function inyectarEstilos() {
     if (document.getElementById("gs-insignia-styles")) return;
     const style = document.createElement("style");
@@ -501,15 +500,20 @@ const INSIGNIAS_INICIALES = {
         border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: 20px;
         width: 100%;
-        max-width: 440px;
-        max-height: 86vh;
+        max-width: 460px;
+        max-height: 88vh;
         overflow-y: auto;
         position: relative;
         box-shadow:
           0 32px 64px -16px rgba(0, 0, 0, 0.9),
           0 0 0 1px rgba(255, 255, 255, 0.04) inset;
         transform: scale(0.95) translateY(10px);
-        transition: transform ${CONFIG.ANIMATION_MS}ms cubic-bezier(0.16, 1, 0.3, 1);
+        transition:
+          max-width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+          transform ${CONFIG.ANIMATION_MS}ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .gs-badge-modal-box.is-catalog {
+        max-width: 720px;
       }
       #gs-badge-modal-overlay.active .gs-badge-modal-box {
         transform: scale(1) translateY(0);
@@ -518,13 +522,27 @@ const INSIGNIAS_INICIALES = {
         transform: scale(0.96) translateY(14px);
       }
 
-      .gs-badge-modal-box::-webkit-scrollbar { width: 5px; }
-      .gs-badge-modal-box::-webkit-scrollbar-track { background: transparent; }
-      .gs-badge-modal-box::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.16); border-radius: 99px; }
+      .gs-badge-modal-box::-webkit-scrollbar,
+      .gs-catalog-view::-webkit-scrollbar,
+      .gs-catalog-chips::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+      }
+      .gs-badge-modal-box::-webkit-scrollbar-track,
+      .gs-catalog-view::-webkit-scrollbar-track,
+      .gs-catalog-chips::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .gs-badge-modal-box::-webkit-scrollbar-thumb,
+      .gs-catalog-view::-webkit-scrollbar-thumb,
+      .gs-catalog-chips::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.16);
+        border-radius: 99px;
+      }
 
       .gs-badge-hero {
         position: relative;
-        padding: 28px 24px 20px;
+        padding: 46px 24px 20px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -535,6 +553,9 @@ const INSIGNIAS_INICIALES = {
         background-size: 100% 100%, 14px 14px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.07);
       }
+      .gs-badge-modal-box.is-catalog .gs-badge-hero {
+        padding: 46px 24px 18px;
+      }
 
       .gs-badge-drag-pill {
         display: none;
@@ -542,45 +563,58 @@ const INSIGNIAS_INICIALES = {
         height: 4px;
         border-radius: 99px;
         background: rgba(255, 255, 255, 0.22);
-        margin: -14px auto 16px;
+        margin: -30px auto 18px;
       }
       @media (pointer: coarse) {
         .gs-badge-drag-pill { display: block; }
       }
 
-      .gs-badge-close,
-      .gs-badge-nav-btn {
+      .gs-badge-close {
+        position: absolute;
+        top: 14px;
+        right: 14px;
         width: 32px;
         height: 32px;
         border-radius: 10px;
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.08);
         color: #a1a1aa;
-        font-size: 18px;
+        font-size: 19px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         transition: all 0.16s ease;
       }
-      .gs-badge-close {
-        position: absolute;
-        top: 14px;
-        right: 14px;
-        font-size: 19px;
+      .gs-badge-close:hover,
+      .gs-badge-close:focus-visible {
+        background: rgba(255, 255, 255, 0.14);
+        color: #ffffff;
+        outline: none;
       }
-      .gs-badge-nav-group {
+
+      .gs-badge-catalog-btn {
         position: absolute;
         top: 14px;
         left: 14px;
-        display: flex;
+        height: 32px;
+        padding: 0 11px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #e4e4e7;
+        font-size: 0.76rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
         gap: 6px;
+        cursor: pointer;
+        transition: all 0.16s ease;
       }
-      .gs-badge-close:hover,
-      .gs-badge-close:focus-visible,
-      .gs-badge-nav-btn:hover,
-      .gs-badge-nav-btn:focus-visible {
-        background: rgba(255, 255, 255, 0.14);
+      .gs-badge-catalog-btn:hover,
+      .gs-badge-catalog-btn:focus-visible {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.22);
         color: #ffffff;
         outline: none;
       }
@@ -628,6 +662,14 @@ const INSIGNIAS_INICIALES = {
         line-height: 1.25;
       }
 
+      .gs-badge-hero-subtitle {
+        margin: 6px 0 0;
+        font-size: 0.82rem;
+        color: #a1a1aa;
+        max-width: 480px;
+        line-height: 1.4;
+      }
+
       .gs-badge-status-note {
         margin-top: 8px;
         font-size: 0.78rem;
@@ -642,6 +684,240 @@ const INSIGNIAS_INICIALES = {
         padding: 18px 22px 6px;
       }
 
+      /* =====================================================================
+         ESTRUCTURA DEL CATÁLOGO OFICIAL
+         ===================================================================== */
+      .gs-catalog-view {
+        padding: 16px 22px 10px;
+        overflow-y: auto;
+      }
+      .gs-catalog-toolbar {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+      .gs-catalog-search-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .gs-catalog-search {
+        flex: 1;
+        min-width: 0;
+        box-sizing: border-box;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 11px;
+        padding: 10px 13px;
+        color: #f4f4f5;
+        font-size: 0.86rem;
+        outline: none;
+        transition: border-color 0.15s ease, background 0.15s ease;
+      }
+      .gs-catalog-search::placeholder {
+        color: #71717a;
+      }
+      .gs-catalog-search:focus {
+        border-color: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .gs-catalog-chips {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        scrollbar-width: auto;
+      }
+
+      .gs-catalog-chip {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        color: #a1a1aa;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 99px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.15s ease;
+      }
+      .gs-catalog-chip:hover,
+      .gs-catalog-chip:focus-visible {
+        background: rgba(255, 255, 255, 0.1);
+        color: #f4f4f5;
+        outline: none;
+      }
+      .gs-catalog-chip.active {
+        background: #f4f4f5;
+        border-color: #f4f4f5;
+        color: #111114;
+      }
+
+      .gs-catalog-section {
+        margin-bottom: 18px;
+      }
+      .gs-catalog-section:last-child {
+        margin-bottom: 4px;
+      }
+      .gs-catalog-section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 9px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      }
+      .gs-catalog-section-title {
+        font-size: 0.74rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #d4d4d8;
+      }
+      .gs-catalog-section-badge {
+        font-size: 0.7rem;
+        color: #71717a;
+        font-weight: 600;
+      }
+
+      .gs-catalog-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+      @media (max-width: 520px) {
+        .gs-catalog-grid { grid-template-columns: 1fr; }
+      }
+      .gs-catalog-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 12px;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        text-align: left;
+        color: #f4f4f5;
+        cursor: pointer;
+        width: 100%;
+        box-sizing: border-box;
+        transition: all 0.16s ease;
+      }
+      .gs-catalog-card:hover,
+      .gs-catalog-card:focus-visible {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.24);
+        transform: translateY(-1px);
+        outline: none;
+      }
+      .gs-catalog-card-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      .gs-catalog-card-icon img {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+      }
+      .gs-catalog-card-info {
+        min-width: 0;
+        flex: 1;
+      }
+      .gs-catalog-card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        margin-bottom: 3px;
+      }
+      .gs-catalog-card-name {
+        font-size: 0.86rem;
+        font-weight: 700;
+        color: #fafafa;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .gs-catalog-card-desc {
+        font-size: 0.76rem;
+        line-height: 1.4;
+        color: #a1a1aa;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-bottom: 6px;
+      }
+      .gs-catalog-card-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        font-size: 0.68rem;
+        color: #71717a;
+      }
+      .gs-catalog-empty {
+        text-align: center;
+        padding: 28px 12px;
+        font-size: 0.86rem;
+        color: #71717a;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px dashed rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+      }
+
+      /* =====================================================================
+         BARRA INFERIOR DE NAVEGACIÓN (SOLO DESDE CATÁLOGO)
+         ===================================================================== */
+      .gs-catalog-pager {
+        margin: 8px 22px 4px;
+        padding: 8px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .gs-catalog-pager-btn {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #e4e4e7;
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 7px 12px;
+        border-radius: 9px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.15s ease;
+      }
+      .gs-catalog-pager-btn:hover,
+      .gs-catalog-pager-btn:focus-visible {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.24);
+        color: #ffffff;
+        outline: none;
+      }
+      .gs-catalog-pager-info {
+        font-size: 0.76rem;
+        font-weight: 600;
+        color: #a1a1aa;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* Acordeones */
       .gs-badge-accordion {
         background: rgba(255, 255, 255, 0.025);
         border: 1px solid rgba(255, 255, 255, 0.075);
@@ -763,7 +1039,9 @@ const INSIGNIAS_INICIALES = {
         #gs-badge-modal-overlay,
         .gs-badge-modal-box,
         .gs-badge-close,
-        .gs-badge-nav-btn,
+        .gs-badge-catalog-btn,
+        .gs-catalog-card,
+        .gs-catalog-pager-btn,
         .gs-badge-accordion summary::after,
         .gs-badge-accordion-content {
           transition: none !important;
@@ -774,15 +1052,13 @@ const INSIGNIAS_INICIALES = {
     document.head.appendChild(style);
   }
 
-  function navegarInsignia(direccion) {
-    const lista = obtenerInsigniasEnPagina();
-    if (lista.length <= 1) return;
-    const idxActual = lista.findIndex((item) => item.datos.archivo === insigniaActualArchivo);
-    const siguienteIdx = idxActual === -1
-      ? 0
-      : (idxActual + direccion + lista.length) % lista.length;
-    const destino = lista[siguienteIdx];
-    abrirModal(destino.src, destino.datos, destino.elemento);
+  function navegarCatalogo(direccion) {
+    if (!desdeCatalogo || listaCatalogoActual.length <= 1) return;
+    indiceCatalogoActual = (indiceCatalogoActual + direccion + listaCatalogoActual.length) % listaCatalogoActual.length;
+    const item = listaCatalogoActual[indiceCatalogoActual];
+    if (item) {
+      abrirModal(`${CONFIG.BASE_URL}${item.archivo}`, item, document.activeElement);
+    }
   }
 
   function crearModal() {
@@ -790,22 +1066,26 @@ const INSIGNIAS_INICIALES = {
     const overlay = document.createElement("div");
     overlay.id = "gs-badge-modal-overlay";
     overlay.innerHTML = `
-      <div class="gs-badge-modal-box" role="dialog" aria-modal="true" aria-labelledby="gs-modal-title">
+      <div id="gs-badge-modal-box" class="gs-badge-modal-box" role="dialog" aria-modal="true" aria-labelledby="gs-modal-title">
         <div class="gs-badge-hero">
           <div class="gs-badge-drag-pill" aria-hidden="true"></div>
-          <div id="gs-modal-nav" class="gs-badge-nav-group" style="display:none;">
-            <button type="button" id="gs-modal-prev" class="gs-badge-nav-btn" aria-label="Insignia anterior" title="Anterior (←)">&#8249;</button>
-            <button type="button" id="gs-modal-next" class="gs-badge-nav-btn" aria-label="Siguiente insignia" title="Siguiente (→)">&#8250;</button>
-          </div>
-          <button type="button" class="gs-badge-close" aria-label="Cerrar ventana de insignia" title="Cerrar (Esc)">&times;</button>
-          <div class="gs-badge-pedestal">
+          <button type="button" id="gs-modal-catalog-btn" class="gs-badge-catalog-btn" title="Ver Catálogo Oficial de Insignias">Catálogo Oficial</button>
+          <button type="button" class="gs-badge-close" aria-label="Cerrar ventana" title="Cerrar (Esc)">&times;</button>
+          <div id="gs-modal-pedestal" class="gs-badge-pedestal">
             <img id="gs-modal-img" src="" alt="" draggable="false">
           </div>
           <span id="gs-modal-category" class="gs-badge-category"></span>
           <h3 id="gs-modal-title"></h3>
+          <p id="gs-modal-subtitle" class="gs-badge-hero-subtitle" style="display:none;"></p>
           <div id="gs-modal-status" class="gs-badge-status-note" style="display:none;"></div>
         </div>
         <div id="gs-modal-fields" class="gs-badge-body"></div>
+        <div id="gs-modal-catalog" class="gs-catalog-view" style="display:none;"></div>
+        <div id="gs-modal-catalog-pager" class="gs-catalog-pager" style="display:none;">
+          <button type="button" id="gs-catalog-prev-btn" class="gs-catalog-pager-btn" aria-label="Insignia anterior del catálogo">&#8592; Anterior</button>
+          <span id="gs-catalog-pager-info" class="gs-catalog-pager-info"></span>
+          <button type="button" id="gs-catalog-next-btn" class="gs-catalog-pager-btn" aria-label="Siguiente insignia del catálogo">Siguiente &#8594;</button>
+        </div>
         <div class="gs-badge-footer">
           <span class="gs-badge-brand"><span class="gs-badge-brand-dot"></span>Grouvex Studios</span>
           <button type="button" id="gs-modal-copy-id" class="gs-badge-copy-id" title="Copiar identificador de archivo"></button>
@@ -814,15 +1094,17 @@ const INSIGNIAS_INICIALES = {
     `;
     document.body.appendChild(overlay);
 
-    const box = overlay.querySelector(".gs-badge-modal-box");
+    const box = overlay.querySelector("#gs-badge-modal-box");
     const btnClose = overlay.querySelector(".gs-badge-close");
-    const btnPrev = overlay.querySelector("#gs-modal-prev");
-    const btnNext = overlay.querySelector("#gs-modal-next");
+    const btnCatalog = overlay.querySelector("#gs-modal-catalog-btn");
     const btnCopy = overlay.querySelector("#gs-modal-copy-id");
+    const btnPrev = overlay.querySelector("#gs-catalog-prev-btn");
+    const btnNext = overlay.querySelector("#gs-catalog-next-btn");
 
     btnClose.addEventListener("click", cerrarModal);
-    btnPrev.addEventListener("click", () => navegarInsignia(-1));
-    btnNext.addEventListener("click", () => navegarInsignia(1));
+    btnCatalog.addEventListener("click", () => abrirCatalogo());
+    btnPrev.addEventListener("click", () => navegarCatalogo(-1));
+    btnNext.addEventListener("click", () => navegarCatalogo(1));
 
     overlay.addEventListener("click", (e) => {
       if (e.target === overlay) cerrarModal();
@@ -867,7 +1149,7 @@ const INSIGNIAS_INICIALES = {
       touchDeltaY = 0;
     });
 
-    // Teclado: Esc, flechas izquierda/derecha y Focus Trap
+    // Teclado: Esc, flechas izquierda/derecha (solo cuando se navega desde catálogo) y Focus Trap
     document.addEventListener("keydown", (e) => {
       if (!overlay.classList.contains("active")) return;
 
@@ -875,16 +1157,20 @@ const INSIGNIAS_INICIALES = {
         cerrarModal();
         return;
       }
-      if (e.key === "ArrowLeft" && document.activeElement?.tagName !== "SUMMARY") {
-        navegarInsignia(-1);
-        return;
-      }
-      if (e.key === "ArrowRight" && document.activeElement?.tagName !== "SUMMARY") {
-        navegarInsignia(1);
-        return;
+      if (desdeCatalogo && document.activeElement?.tagName !== "INPUT" && document.activeElement?.tagName !== "SUMMARY") {
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          navegarCatalogo(-1);
+          return;
+        }
+        if (e.key === "ArrowRight") {
+          e.preventDefault();
+          navegarCatalogo(1);
+          return;
+        }
       }
       if (e.key === "Tab") {
-        const focusables = box.querySelectorAll('a[href], button:not([disabled]), summary, [tabindex]:not([tabindex="-1"])');
+        const focusables = box.querySelectorAll('a[href], button:not([disabled]), input, summary, [tabindex]:not([tabindex="-1"])');
         if (!focusables.length) return;
         const primero = focusables[0];
         const ultimo = focusables[focusables.length - 1];
@@ -906,7 +1192,9 @@ const INSIGNIAS_INICIALES = {
 
     overlay.classList.add("closing");
     document.body.style.overflow = "";
-    insigniaActualArchivo = null;
+    desdeCatalogo = false;
+    listaCatalogoActual = [];
+    indiceCatalogoActual = -1;
 
     setTimeout(() => {
       overlay.classList.remove("active", "closing");
@@ -916,23 +1204,268 @@ const INSIGNIAS_INICIALES = {
     }, CONFIG.ANIMATION_MS);
   }
 
+  function crearTarjetaCatalogo(item, listaVisible, indiceEnLista) {
+    const src = `${CONFIG.BASE_URL}${item.archivo}`;
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "gs-catalog-card";
+
+    const iconWrap = document.createElement("div");
+    iconWrap.className = "gs-catalog-card-icon";
+    const img = document.createElement("img");
+    img.alt = item.nombre;
+    img.loading = "lazy";
+    if (urlsRotas.has(src)) {
+      img.src = ESCUDO_403_URI;
+    } else {
+      img.src = src;
+      img.onerror = () => {
+        urlsRotas.add(src);
+        img.onerror = null;
+        img.src = ESCUDO_403_URI;
+      };
+    }
+    iconWrap.appendChild(img);
+
+    const info = document.createElement("div");
+    info.className = "gs-catalog-card-info";
+
+    const top = document.createElement("div");
+    top.className = "gs-catalog-card-top";
+    const nameEl = document.createElement("div");
+    nameEl.className = "gs-catalog-card-name";
+    nameEl.textContent = item.nombre;
+    top.appendChild(nameEl);
+
+    const descEl = document.createElement("div");
+    descEl.className = "gs-catalog-card-desc";
+    const descBruta = item.campos?.["Descripción"] || "";
+    descEl.textContent = extraerTextoPlano(descBruta) || "Distintivo oficial del Ecosistema Grouvex Studios.";
+
+    const meta = document.createElement("div");
+    meta.className = "gs-catalog-card-meta";
+    const catSpan = document.createElement("span");
+    catSpan.textContent = item.categoria || "General";
+    meta.appendChild(catSpan);
+
+    info.appendChild(top);
+    info.appendChild(descEl);
+    info.appendChild(meta);
+
+    card.appendChild(iconWrap);
+    card.appendChild(info);
+
+    card.addEventListener("click", () => {
+      desdeCatalogo = true;
+      listaCatalogoActual = listaVisible;
+      indiceCatalogoActual = indiceEnLista;
+      abrirModal(src, item, card);
+    });
+
+    return card;
+  }
+
+  function abrirCatalogo(elementoOrigen, mantenerFiltros = false) {
+    const overlay = document.getElementById("gs-badge-modal-overlay");
+    const box = document.getElementById("gs-badge-modal-box");
+    const pedestal = document.getElementById("gs-modal-pedestal");
+    const catEl = document.getElementById("gs-modal-category");
+    const titleEl = document.getElementById("gs-modal-title");
+    const subtitleEl = document.getElementById("gs-modal-subtitle");
+    const statusEl = document.getElementById("gs-modal-status");
+    const fieldsContainer = document.getElementById("gs-modal-fields");
+    const catalogContainer = document.getElementById("gs-modal-catalog");
+    const pagerContainer = document.getElementById("gs-modal-catalog-pager");
+    const btnCatalog = document.getElementById("gs-modal-catalog-btn");
+    const btnCopy = document.getElementById("gs-modal-copy-id");
+
+    if (!overlay.classList.contains("active")) {
+      ultimoElementoEnfocado = elementoOrigen || document.activeElement;
+    }
+
+    if (!mantenerFiltros) {
+      filtroTextoCatalogo = "";
+      filtroCategoriaCatalogo = "Todas";
+    }
+
+    desdeCatalogo = false;
+    box.classList.add("is-catalog");
+    box.scrollTop = 0;
+
+    pedestal.style.display = "none";
+    statusEl.style.display = "none";
+    fieldsContainer.style.display = "none";
+    pagerContainer.style.display = "none";
+    btnCatalog.style.display = "none";
+    btnCopy.style.display = "none";
+
+    catEl.textContent = "Registro Normativo · Arts. 22 – 23.5";
+    catEl.style.display = "inline-block";
+    titleEl.textContent = "Catálogo Oficial de Insignias";
+    subtitleEl.textContent = "Explora los distintivos vigentes del Ecosistema Grouvex Studios, sus requisitos de obtención, derechos y obligaciones.";
+    subtitleEl.style.display = "block";
+
+    const todas = Array.from(dbIndexada.values());
+    const categoriasUnicas = ["Todas", ...new Set(todas.map((i) => i.categoria).filter(Boolean))];
+
+    catalogContainer.innerHTML = `
+      <div class="gs-catalog-toolbar">
+        <div class="gs-catalog-search-row">
+          <input type="search" id="gs-catalog-search-input" class="gs-catalog-search" placeholder="Buscar por nombre, rango o requisito..." autocomplete="off">
+        </div>
+        <div id="gs-catalog-chips" class="gs-catalog-chips" role="tablist" aria-label="Filtrar por categoría"></div>
+      </div>
+      <div id="gs-catalog-results"></div>
+    `;
+    catalogContainer.style.display = "block";
+
+    const inputBusqueda = catalogContainer.querySelector("#gs-catalog-search-input");
+    const chipsContainer = catalogContainer.querySelector("#gs-catalog-chips");
+    const resultsContainer = catalogContainer.querySelector("#gs-catalog-results");
+
+    inputBusqueda.value = filtroTextoCatalogo;
+
+    function renderizarChips() {
+      chipsContainer.innerHTML = "";
+      categoriasUnicas.forEach((cat) => {
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = `gs-catalog-chip${filtroCategoriaCatalogo === cat ? " active" : ""}`;
+        chip.textContent = cat;
+        chip.addEventListener("click", () => {
+          filtroCategoriaCatalogo = cat;
+          renderizarChips();
+          renderizarResultados();
+        });
+        chipsContainer.appendChild(chip);
+      });
+    }
+
+    function renderizarResultados() {
+      const q = filtroTextoCatalogo.trim().toLowerCase();
+
+      const filtradas = todas.filter((item) => {
+        const coincideCat = filtroCategoriaCatalogo === "Todas" || item.categoria === filtroCategoriaCatalogo;
+        if (!coincideCat) return false;
+        if (!q) return true;
+
+        const textoCampos = item.campos ? Object.values(item.campos).join(" ") : "";
+        return (
+          item.nombre.toLowerCase().includes(q) ||
+          (item.categoria || "").toLowerCase().includes(q) ||
+          item.archivo.toLowerCase().includes(q) ||
+          extraerTextoPlano(textoCampos).toLowerCase().includes(q)
+        );
+      });
+
+      resultsContainer.innerHTML = "";
+
+      if (filtradas.length === 0) {
+        resultsContainer.innerHTML = `<div class="gs-catalog-empty">No se encontraron insignias que coincidan con tu búsqueda.</div>`;
+        return;
+      }
+
+      // Si estamos en "Todas" sin texto de búsqueda, agrupar por categoría
+      if (filtroCategoriaCatalogo === "Todas" && !q) {
+        const grupos = new Map();
+        filtradas.forEach((item) => {
+          const cat = item.categoria || "Otras";
+          if (!grupos.has(cat)) grupos.set(cat, []);
+          grupos.get(cat).push(item);
+        });
+
+        let indiceGlobal = 0;
+        grupos.forEach((itemsGrupo, nombreGrupo) => {
+          const section = document.createElement("section");
+          section.className = "gs-catalog-section";
+
+          const header = document.createElement("div");
+          header.className = "gs-catalog-section-header";
+          header.innerHTML = `
+            <span class="gs-catalog-section-title">${nombreGrupo}</span>
+            <span class="gs-catalog-section-badge">${itemsGrupo.length} ${itemsGrupo.length === 1 ? "insignia" : "insignias"}</span>
+          `;
+
+          const grid = document.createElement("div");
+          grid.className = "gs-catalog-grid";
+          itemsGrupo.forEach((item) => {
+            grid.appendChild(crearTarjetaCatalogo(item, filtradas, indiceGlobal));
+            indiceGlobal++;
+          });
+
+          section.appendChild(header);
+          section.appendChild(grid);
+          resultsContainer.appendChild(section);
+        });
+      } else {
+        const grid = document.createElement("div");
+        grid.className = "gs-catalog-grid";
+        filtradas.forEach((item, idx) => {
+          grid.appendChild(crearTarjetaCatalogo(item, filtradas, idx));
+        });
+        resultsContainer.appendChild(grid);
+      }
+    }
+
+    renderizarChips();
+    renderizarResultados();
+
+    inputBusqueda.addEventListener("input", (e) => {
+      filtroTextoCatalogo = e.target.value;
+      renderizarResultados();
+    });
+
+    document.body.style.overflow = "hidden";
+    overlay.classList.add("active");
+
+    requestAnimationFrame(() => {
+      inputBusqueda.focus();
+    });
+  }
+
   function abrirModal(srcOriginal, datos, elementoOrigen) {
     const overlay = document.getElementById("gs-badge-modal-overlay");
+    const box = document.getElementById("gs-badge-modal-box");
+    const pedestal = document.getElementById("gs-modal-pedestal");
     const imgEl = document.getElementById("gs-modal-img");
     const catEl = document.getElementById("gs-modal-category");
     const titleEl = document.getElementById("gs-modal-title");
+    const subtitleEl = document.getElementById("gs-modal-subtitle");
     const statusEl = document.getElementById("gs-modal-status");
     const fieldsContainer = document.getElementById("gs-modal-fields");
-    const navGroup = document.getElementById("gs-modal-nav");
+    const catalogContainer = document.getElementById("gs-modal-catalog");
+    const pagerContainer = document.getElementById("gs-modal-catalog-pager");
+    const pagerInfo = document.getElementById("gs-catalog-pager-info");
+    const btnCatalog = document.getElementById("gs-modal-catalog-btn");
     const btnCopy = document.getElementById("gs-modal-copy-id");
 
-    if (!insigniaActualArchivo) {
+    if (!overlay.classList.contains("active")) {
       ultimoElementoEnfocado = elementoOrigen || document.activeElement;
     }
-    insigniaActualArchivo = datos.archivo;
 
-    const insigniasEnPagina = obtenerInsigniasEnPagina();
-    navGroup.style.display = insigniasEnPagina.length > 1 ? "flex" : "none";
+    box.classList.remove("is-catalog");
+    box.scrollTop = 0;
+
+    catalogContainer.style.display = "none";
+    subtitleEl.style.display = "none";
+    pedestal.style.display = "flex";
+    btnCatalog.style.display = "inline-flex";
+    btnCopy.style.display = "inline-block";
+
+    if (desdeCatalogo) {
+      btnCatalog.textContent = "← Catálogo Oficial";
+      btnCatalog.onclick = () => abrirCatalogo(null, true);
+      if (listaCatalogoActual.length > 1) {
+        pagerContainer.style.display = "flex";
+        pagerInfo.textContent = `${indiceCatalogoActual + 1} / ${listaCatalogoActual.length}`;
+      } else {
+        pagerContainer.style.display = "none";
+      }
+    } else {
+      btnCatalog.textContent = "Catálogo Oficial";
+      btnCatalog.onclick = () => abrirCatalogo();
+      pagerContainer.style.display = "none";
+    }
 
     const yaFallo = Boolean(elementoOrigen?.dataset?.gsImageBroken) || urlsRotas.has(srcOriginal);
 
@@ -1017,7 +1550,9 @@ const INSIGNIAS_INICIALES = {
     overlay.classList.add("active");
 
     requestAnimationFrame(() => {
-      overlay.querySelector(".gs-badge-close")?.focus();
+      if (!desdeCatalogo) {
+        overlay.querySelector(".gs-badge-close")?.focus();
+      }
     });
   }
 
@@ -1189,6 +1724,9 @@ const INSIGNIAS_INICIALES = {
 
       e.preventDefault();
       e.stopPropagation();
+      desdeCatalogo = false;
+      listaCatalogoActual = [];
+      indiceCatalogoActual = -1;
       abrirModal(srcOriginal, datos, img);
     };
 
@@ -1215,6 +1753,11 @@ const INSIGNIAS_INICIALES = {
 
   function comprobarDeepLink() {
     const params = new URLSearchParams(window.location.search);
+    if (params.get("catalogo") === "1" || window.location.hash === "#catalogo") {
+      abrirCatalogo();
+      return;
+    }
+
     let archivo = params.get("insignia");
     if (!archivo && window.location.hash.startsWith("#insignia=")) {
       archivo = decodeURIComponent(window.location.hash.slice("#insignia=".length));
@@ -1236,10 +1779,14 @@ const INSIGNIAS_INICIALES = {
 
   window.GSInsignias = {
     abrir: (nombreArchivo) => {
+      desdeCatalogo = false;
+      listaCatalogoActual = [];
+      indiceCatalogoActual = -1;
       const src = `${CONFIG.BASE_URL}${nombreArchivo}`;
       const datos = obtenerDatosInsignia(src);
       if (datos) abrirModal(src, datos, document.activeElement);
     },
+    abrirCatalogo: () => abrirCatalogo(document.activeElement),
     cerrar: cerrarModal,
     refrescar: () => {
       indexarBaseDeDatos();
