@@ -1,7 +1,16 @@
 (() => {
   if (window.__STATUS_BADGES_INITIALIZED__) return;
   window.__STATUS_BADGES_INITIALIZED__ = true;
+  const CONFIG = {
+    ALLOWED_DOMAINS: ["grouvex.com", "ecosistema-de-grouvex-studios.github.io", "grouvex-github-io.pages.dev"],
+  };
 
+  // 0. Guardián de dominio configurable
+  const hostActual = (window.location.hostname || "").toLowerCase();
+  const esDominioAutorizado = CONFIG.ALLOWED_DOMAINS.some(
+    (dominio) => hostActual === dominio || hostActual.endsWith(`.${dominio}`)
+  );
+  if (!esDominioAutorizado) return;
   // ==========================================================================
   // 1. ÚNICA FUENTE DE VERDAD (STATUS_CONFIG)
   // ==========================================================================
