@@ -303,7 +303,7 @@ const INSIGNIAS_INICIALES = {
     BASE_URL: "https://raw.githubusercontent.com/ecosistema-de-grouvex-studios/esistema.grouvex.github.io/refs/heads/main/imagen/sede/",
     BASE_PATH: "/ecosistema-de-grouvex-studios/esistema.grouvex.github.io/refs/heads/main/imagen/sede/",
     IMAGE_HOST: "raw.githubusercontent.com",
-    ALLOWED_DOMAINS: ["grouvex.com", "ecosistema-de-grouvex-studios.github.io"],
+    ALLOWED_DOMAINS: ["grouvex.com", "ecosistema-de-grouvex-studios.github.io", "grouvex-github-io.pages.dev"],
     EXCLUDED_KEYWORDS: ["banner", "logo"],
     ANIMATION_MS: 220
   };
@@ -313,7 +313,7 @@ const INSIGNIAS_INICIALES = {
   const esDominioAutorizado = CONFIG.ALLOWED_DOMAINS.some(
     (dominio) => hostActual === dominio || hostActual.endsWith(`.${dominio}`)
   );
-  if (esDominioAutorizado) return;
+  if (!esDominioAutorizado) return;
 
   if (window.__GS_BADGE_SYSTEM_INIT__) return;
   window.__GS_BADGE_SYSTEM_INIT__ = true;
