@@ -1,7 +1,13 @@
 /**
  * Sistema de Insignias - Ecosistema Grouvex Studios
- * Versión 6.2 - HTML libre en campos (con soporte de estilos inline), restricción a grouvex.com (*.grouvex.com)
+ * Versión 7.1 - Estética uniforme (sin acentos por rango), sin alterar el tamaño de las <img>,
+ * navegación entre insignias, deep-linking (#insignia=), caché de errores y exclusiones configurables.
  */
+
+const REGLAS_COMUNES_INSIGNIA = {
+  "Transferibilidad y Revocación":
+    "Insignia personal e <b>intransferible</b> (Art. 22). Sujeta a degradación de rango o revocación total e inhabilitación por quebrantamiento de integridad, prácticas fraudulentas, uso indebido del estatus o incumplimiento normativo (Art. 23.5)."
+};
 
 const INSIGNIAS_INICIALES = {
   // =========================================================================
@@ -14,8 +20,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Certifica que el usuario es una persona física real registrada en la Base de Datos con estado <b>Aprobado</b>, habiendo superado la validación de identidad exigida por el Departamento Legal y garantizando que no es un perfil automatizado o bot (Art. 23.4).",
       "Cómo obtenerlo": "Registrándose en la plataforma de Grouvex Studios, aportando los datos mínimos de registro y obteniendo la aprobación de estado en la Base de Datos (solo se obtiene <b>1 vez por usuario</b>, Art. 22).",
       "Derechos": "Acceso completo a los servicios administrativos básicos, distintivo oficial en el perfil y Tarjeta de Identidad (TIGS), y ejercicio pleno de derechos comunitarios y ARCO (Art. 13.1).",
-      "Obligaciones": "Mantener datos verídicos, respetar los Términos de Servicio (Anexo I), cumplir el estándar de clasificación de contenidos (CCPM) y abstenerse de suplantar identidades o manipular métricas (Art. 13.2).",
-      "Transferibilidad y Revocación": "Insignia personal e <b>intransferible</b> (Art. 22). Sujeta a revocación total e inhabilitación por quebrantamiento de integridad, prácticas fraudulentas, uso indebido del estatus o incumplimiento normativo (Art. 23.5)."
+      "Obligaciones": "Mantener datos verídicos, respetar los Términos de Servicio (Anexo I), cumplir el estándar de clasificación de contenidos (CCPM) y abstenerse de suplantar identidades o manipular métricas (Art. 13.2)."
     }
   },
   "vip.png": {
@@ -25,8 +30,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Distintivo de perfil que acredita la suscripción o titularidad activa de un plan de nivel superior dentro de los organismos del ecosistema.",
       "Cómo obtenerlo": "Disponiendo activamente del <b>Plan Estándar o superior</b> en cualquier organismo de Grouvex Studios (ej. GSRecords o GSDesigns).",
       "Derechos": "Identificación visual VIP en el perfil y acceso a las prestaciones, beneficios y servicios asociados al plan contratado en el organismo correspondiente.",
-      "Obligaciones": "Mantener vigente el plan contratado, disponer del saldo de XP o fondos requeridos para trámites (Art. 30.2) y cumplir los Términos de Servicio (Anexo I).",
-      "Transferibilidad y Revocación": "Insignia personal e <b>intransferible</b> (Art. 22). Se retira al finalizar el plan contratado o por infracción normativa según el Art. 23.5."
+      "Obligaciones": "Mantener vigente el plan contratado, disponer del saldo de XP o fondos requeridos para trámites (Art. 30.2) y cumplir los Términos de Servicio (Anexo I)."
     }
   },
 
@@ -40,8 +44,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Reconocimiento oficial a los miembros que identifican errores de código, fallos técnicos o vulnerabilidades de seguridad en las plataformas y sistemas del Ecosistema de Grouvex Studios.",
       "Cómo obtenerlo": "Identificando errores de código o fallos reproducibles y reportándolos formalmente a través del repositorio oficial en <b>GitHub Grouvex Studios</b>.",
       "Derechos": "Reconocimiento público en el perfil y TIGS, acceso anticipado a fases de prueba (beta testing) y posibilidad de recibir bonificaciones de Puntos de Experiencia (XP) por méritos extraordinarios en detección de fallos (Art. 31.1.b).",
-      "Obligaciones": "Actuar de buena fe, no explotar las vulnerabilidades detectadas ni comprometer la confidencialidad o integridad de los sistemas y datos de usuarios (Art. 13.2.a).",
-      "Transferibilidad y Revocación": "Insignia <b>intransferible</b>. Será revocada de forma fulminante si se emplean los conocimientos técnicos para ataques, acceso no autorizado o divulgación maliciosa (Art. 23.5)."
+      "Obligaciones": "Actuar de buena fe, no explotar las vulnerabilidades detectadas ni comprometer la confidencialidad o integridad de los sistemas y datos de usuarios (Art. 13.2.a)."
     }
   },
   "bughunter-expert.png": {
@@ -51,8 +54,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Grado avanzado otorgado a cazadores de errores con trayectoria destacada y colaboración continua en la resolución y mejora técnica del ecosistema.",
       "Cómo obtenerlo": "Cumpliendo todos los requisitos de <i>Cazador de Errores</i> (reporte de fallos de código en <b>GitHub Grouvex Studios</b>), ayudando activamente al equipo técnico y manteniendo una <b>actividad constante</b>.",
       "Derechos": "Distintivo experto en perfil y TIGS, prioridad en canales técnicos y bonificaciones de XP por contribución en seguridad y estabilidad (Art. 31.1.b).",
-      "Obligaciones": "Mantener la actividad constante de reporte responsable, confidencialidad sobre vulnerabilidades no parcheadas y estricto apego al código ético.",
-      "Transferibilidad y Revocación": "Insignia <b>intransferible</b>. Sujeta a degradación al rango básico si cesa la actividad constante, o revocación total por infracción grave (Art. 23.5)."
+      "Obligaciones": "Mantener la actividad constante de reporte responsable, confidencialidad sobre vulnerabilidades no parcheadas y estricto apego al código ético."
     }
   },
 
@@ -66,8 +68,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Distintivo otorgado a los programadores y colaboradores técnicos que contribuyen directamente al código fuente de la plataforma web.",
       "Cómo obtenerlo": "Modificando o creando código aprobado para mejorar la <b>página web</b> oficial de Grouvex Studios.",
       "Derechos": "Acreditación oficial como colaborador técnico en el perfil y TIGS, y elegibilidad para reconocimientos o <i>Awards</i> por excelencia técnica (Art. 33.2).",
-      "Obligaciones": "Respetar los estándares de calidad, seguridad y propiedad intelectual del repositorio, sin introducir código malicioso ni vulnerabilidades.",
-      "Transferibilidad y Revocación": "Insignia <b>intransferible</b>. Sujeta a revocación inmediata ante prácticas fraudulentas, sabotaje técnico o incumplimiento normativo (Art. 23.5)."
+      "Obligaciones": "Respetar los estándares de calidad, seguridad y propiedad intelectual del repositorio, sin introducir código malicioso ni vulnerabilidades."
     }
   },
   "desarrollador-experimentado.png": {
@@ -77,8 +78,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Reconocimiento técnico superior para desarrolladores con amplia experiencia que aportan arquitectura y software más allá del entorno web, integrados dentro del <b>Equipo Headquarters</b>.",
       "Cómo obtenerlo": "Cumpliendo los requisitos de <i>Desarrollador</i>, demostrando mayor experiencia mediante desarrollos de código fuera de la página web y superando las <b>pruebas del Equipo Headquarters de moderadores</b>.",
       "Derechos": "Membresía plena en el Equipo Headquarters, acceso a herramientas avanzadas de desarrollo e infraestructura (CID) y derechos laborales del equipo (Art. 13.4).",
-      "Obligaciones": "Cumplir las responsabilidades propias del Equipo Headquarters, proteger la seguridad e integridad de los sistemas (CSPD) y mantener estricta confidencialidad.",
-      "Transferibilidad y Revocación": "Insignia <b>intransferible</b>. Sujeta a degradación o revocación por incumplimiento de funciones o infracciones al reglamento (Art. 23.5)."
+      "Obligaciones": "Cumplir las responsabilidades propias del Equipo Headquarters, proteger la seguridad e integridad de los sistemas (CSPD) y mantener estricta confidencialidad."
     }
   },
 
@@ -92,8 +92,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Distintivo que reconoce la permanencia, fidelidad y apoyo continuo de un miembro hacia Grouvex Studios, sus proyectos y su comunidad.",
       "Cómo obtenerlo": "Siendo socio de Grouvex Studios durante al menos <b>1 año</b> y demostrando apoyo activo a la organización, sus proyectos y sus miembros.",
       "Derechos": "Acreditación oficial como Partner en perfil y TIGS, y elegibilidad para beneficios futuros como <b>descuentos</b> en servicios del ecosistema.",
-      "Obligaciones": "Mantener una conducta ejemplar, apoyar los valores de la comunidad y respetar los Términos de Servicio y Políticas de Privacidad.",
-      "Transferibilidad y Revocación": "Insignia personal e <b>intransferible</b>. Sujeta a revocación si el titular incurre en conductas lesivas contra la reputación de Grouvex Studios (Art. 23.5)."
+      "Obligaciones": "Mantener una conducta ejemplar, apoyar los valores de la comunidad y respetar los Términos de Servicio y Políticas de Privacidad."
     }
   },
   "socio-experimentado.png": {
@@ -103,8 +102,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Reconocimiento de máxima fidelidad para socios veteranos con trayectoria prolongada de respaldo continuo a todo el ecosistema de Grouvex Studios.",
       "Cómo obtenerlo": "Contando con una antigüedad superior al mínimo de <b>1 año como Socio</b> y manteniendo un apoyo sostenido a Grouvex Studios, sus proyectos y miembros.",
       "Derechos": "Estatus de Partner veterano y acceso preferente a beneficios ampliados, incluyendo <b>descuentos mayores, regalos</b> y promociones exclusivas del ecosistema.",
-      "Obligaciones": "Conservar el compromiso ético, el respeto comunitario y la integridad exigida a todos los miembros acreditados.",
-      "Transferibilidad y Revocación": "Insignia personal e <b>intransferible</b>. Sujeta a degradación o revocación conforme al Art. 23.5."
+      "Obligaciones": "Conservar el compromiso ético, el respeto comunitario y la integridad exigida a todos los miembros acreditados."
     }
   },
 
@@ -118,8 +116,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Acreditación base de pertenencia aprobada al equipo institucional de Grouvex Studios dentro de la web oficial y la Tarjeta de Identidad (TIGS, Art. 26.1.5).",
       "Cómo obtenerlo": "Estando registrado en la Página Web oficial y obteniendo la aprobación expresa del equipo de Grouvex Studios como miembro acreditado.",
       "Derechos": "Identificación oficial como miembro en la TIGS, acceso a canales internos y garantías laborales y de descanso del Art. 13.4.",
-      "Obligaciones": "Cumplir las directrices del Boletín Oficial, respetar la privacidad de los usuarios y mantener la veracidad en su registro.",
-      "Transferibilidad y Revocación": "Insignia personal e <b>intransferible</b>. Sujeta a suspensión o retirada si el estado del registro cambia o por infracción normativa (Arts. 23.5 y 24.4)."
+      "Obligaciones": "Cumplir las directrices del Boletín Oficial, respetar la privacidad de los usuarios y mantener la veracidad en su registro."
     }
   },
   "verified-team.png": {
@@ -129,8 +126,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Distintivo general que acredita a los miembros activos integrados en la estructura operativa del Equipo Headquarters de Grouvex Studios.",
       "Cómo obtenerlo": "Superando el proceso de selección formal (Art. 21) y las pruebas de acceso establecidas por el Equipo Headquarters.",
       "Derechos": "Acceso a herramientas de gestión y soporte, emisión de TIGS acreditativa (Art. 24.3), 30 días naturales de vacaciones retribuidas y derecho a la desconexión digital (Art. 13.4).",
-      "Obligaciones": "Desempeñar sus funciones con diligencia, mantener confidencialidad absoluta y portar la TIGS en actuaciones oficiales (Art. 25).",
-      "Transferibilidad y Revocación": "Distintivo personal e <b>intransferible</b>. Sujeto a degradación o revocación inmediata por vulneración ética o abuso de funciones (Art. 23.5)."
+      "Obligaciones": "Desempeñar sus funciones con diligencia, mantener confidencialidad absoluta y portar la TIGS en actuaciones oficiales (Art. 25)."
     }
   },
 
@@ -144,8 +140,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Rango inicial del cuerpo de moderación encargado de asistir al equipo y brindar atención directa de soporte a los miembros de la comunidad.",
       "Cómo obtenerlo": "Aprobando el <b>test de acceso para moderador</b> y colaborando activamente en las tareas requeridas y atención de Soporte.",
       "Derechos": "Acreditación en el Equipo de Moderación, acceso a canales de soporte y formación interna a través del Centro de Formación y Mentoría (CFM).",
-      "Obligaciones": "Asistir en tareas de soporte comunitario, seguir las instrucciones de moderadores y administradores, y aplicar un trato equitativo y respetuoso (Art. 13.1.c).",
-      "Transferibilidad y Revocación": "Insignia <b>intransferible</b>. Sujeta a retirada por bajo desempeño, incumplimiento de directrices o infracción del reglamento (Art. 23.5)."
+      "Obligaciones": "Asistir en tareas de soporte comunitario, seguir las instrucciones de moderadores y administradores, y aplicar un trato equitativo y respetuoso (Art. 13.1.c)."
     }
   },
   "moderador.png": {
@@ -155,8 +150,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Agente operativo encargado de velar por la seguridad de los miembros y atender y resolver sus asuntos dentro de Grouvex Studios y sus sedes derivadas.",
       "Cómo obtenerlo": "Superando la etapa de aprendizaje y obteniendo una <b>aprobación por voto de 2/5</b> ponderada entre los miembros habilitados (50% Moderadores/Superiores, 30% rango intermedio y 20% rango base).",
       "Derechos": "Facultad de supervisión, edición, bloqueo o eliminación preventiva de contenidos contrarios al reglamento (Art. 13.3.a) y voto en procesos de promoción interna.",
-      "Obligaciones": "Velar por la seguridad de la comunidad, respetar el debido proceso y el derecho de audiencia de 72 horas ante sanciones (Art. 13.3.c) y presentar su TIGS cuando se requiera.",
-      "Transferibilidad y Revocación": "Insignia <b>intransferible</b>. Sujeta a degradación o revocación por abuso de facultades de moderación o parcialidad manifiesta (Art. 23.5)."
+      "Obligaciones": "Velar por la seguridad de la comunidad, respetar el debido proceso y el derecho de audiencia de 72 horas ante sanciones (Art. 13.3.c) y presentar su TIGS cuando se requiera."
     }
   },
   "moderador-experimentado.png": {
@@ -166,8 +160,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Rango senior de moderación con trayectoria consolidada, actividad constante y participación en tareas de apoyo administrativo.",
       "Cómo obtenerlo": "Cumpliendo todos los requisitos de <i>Moderador</i>, realizando tareas de ámbito administrativo, manteniendo una <b>actividad constante</b> y obteniendo una <b>aprobación por voto de 3/5</b>.",
       "Derechos": "Autoridad senior en moderación comunitaria, mayor peso en decisiones operativas del equipo y acceso a funciones de gestión delegada.",
-      "Obligaciones": "Mantener actividad constante, mentorizar a moderadores aprendices, garantizar la imparcialidad en resoluciones y proteger la integridad del ecosistema.",
-      "Transferibilidad y Revocación": "Insignia <b>intransferible</b>. Sujeta a degradación a Moderador si cesa la actividad constante, o revocación total por infracción grave (Art. 23.5)."
+      "Obligaciones": "Mantener actividad constante, mentorizar a moderadores aprendices, garantizar la imparcialidad en resoluciones y proteger la integridad del ecosistema."
     }
   },
 
@@ -181,8 +174,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Cargo de gestión superior con autoridad administrativa sobre plataformas, registros, normativas y equipos operativos de Grouvex Studios.",
       "Cómo obtenerlo": "Poseyendo la insignia de <i>Moderador Experimentado</i> (o equivalente habilitante) y obteniendo una <b>aprobación por voto de 4/5</b> (ponderada al 40% y 60% según rango votante).",
       "Derechos": "Aplicación del régimen de sanciones progresivas (Art. 13.3.b), edición de vigencia documental en el Boletín (Art. 18), gestión de usuarios y acceso completo a TIGS.",
-      "Obligaciones": "Garantizar el cumplimiento legal y normativo, respetar los derechos ARCO y privacidad de datos (Anexo I) y actuar bajo el principio de debido proceso.",
-      "Transferibilidad y Revocación": "Insignia <b>intransferible</b>. Sujeta a degradación o revocación por negligencia grave, abuso de poder o vulneración de confidencialidad (Art. 23.5)."
+      "Obligaciones": "Garantizar el cumplimiento legal y normativo, respetar los derechos ARCO y privacidad de datos (Anexo I) y actuar bajo el principio de debido proceso."
     }
   },
   "administrador-experimentado.png": {
@@ -192,8 +184,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Rango directivo dentro del cuerpo de administración que acredita amplia trayectoria y dominio operativo en Grouvex Studios y todas sus sedes derivadas.",
       "Cómo obtenerlo": "Cumpliendo todos los requisitos de <i>Administrador</i> y acreditando sólida <b>experiencia en Grouvex Studios y sus derivadas</b> (GSRecords, GSDesigns, GSGames).",
       "Derechos": "Coordinación transversal entre sedes, supervisión de procesos administrativos complejos y participación en decisiones estratégicas del Equipo Headquarters.",
-      "Obligaciones": "Velar por la cohesión normativa entre el Organismo Principal y los Organismos Secundarios (Art. 14) y supervisar el cumplimiento ético de los equipos.",
-      "Transferibilidad y Revocación": "Insignia <b>intransferible</b>. Sujeta a los protocolos de auditoría, degradación y revocación del Art. 23.5."
+      "Obligaciones": "Velar por la cohesión normativa entre el Organismo Principal y los Organismos Secundarios (Art. 14) y supervisar el cumplimiento ético de los equipos."
     }
   },
   "sistema.png": {
@@ -203,8 +194,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Identificador oficial del <b>Sistema</b> (decisión final, comunicados oficiales y estructura lógica con autoridad vinculante, Art. 3) y de los <b>Jefes de Equipo / Portavoces oficiales</b> (Art. 23.2).",
       "Cómo obtenerlo": "No obtenible por usuarios generales. Reservado para los agentes y procesos lógicos del Sistema y para los Jefes de Equipo que hayan superado todos los requisitos administrativos previos.",
       "Derechos": "Autoridad vinculante en resoluciones y comunicados oficiales, portavocía oficial de los equipos, ejecución de procesos automatizados y control parental/UAS (Art. 39).",
-      "Obligaciones": "Garantizar la integridad técnica, la seguridad operacional, la privacidad por defecto (Art. 17) y el estricto cumplimiento de las disposiciones del Boletín Oficial.",
-      "Transferibilidad y Revocación": "Uso estrictamente institucional e <b>intransferible</b>, auditado por el Centro de Seguridad, Privacidad y Defensa (CSPD) y la Dirección General."
+      "Obligaciones": "Garantizar la integridad técnica, la seguridad operacional, la privacidad por defecto (Art. 17) y el estricto cumplimiento de las disposiciones del Boletín Oficial."
     }
   },
 
@@ -218,8 +208,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Máxima distinción de titularidad correspondiente al Propietario del Organismo Principal <b>Grouvex Studios</b>.",
       "Cómo obtenerlo": "Titularidad ejecutiva y fundacional del Organismo Principal Grouvex Studios.",
       "Derechos": "Dirección general del Ecosistema Global, concesión y revocación de <i>Awards</i> (Arts. 33 y 35), resolución última de conflictos y supervisión de todas las sedes.",
-      "Obligaciones": "Garantizar la sostenibilidad, legalidad, ética corporativa y cumplimiento del Reglamento de Documentación Corporativa (Art. 20).",
-      "Transferibilidad y Revocación": "Distintivo titular e <b>intransferible</b> vinculado a la propiedad del Organismo Principal."
+      "Obligaciones": "Garantizar la sostenibilidad, legalidad, ética corporativa y cumplimiento del Reglamento de Documentación Corporativa (Art. 20)."
     }
   },
   "ownerRecords.png": {
@@ -229,8 +218,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Identifica al Propietario o Jefatura Principal de la sede secundaria <b>Grouvex Studios Records (GSRecords)</b>, sello discográfico dedicado a la producción, distribución musical y gestión de talento sonoro (Art. 6.1).",
       "Cómo obtenerlo": "Asignación directa por titularidad o nombramiento ejecutivo como Propietario de Grouvex Studios Records dentro de la estructura organizativa oficial (Art. 7).",
       "Derechos": "Dirección operativa y creativa de GSRecords (Anexo II), gestión de planes de distribución musical, firma de contratos de exclusividad y propuesta de <i>Awards</i> (Art. 33).",
-      "Obligaciones": "Supervisión legal y artística del sello, cumplimiento del estándar explícito <b>UAS</b> (Art. 38), respeto a los derechos morales de los artistas (Art. 13.1.d) y segregación de datos entre sedes (<i>Chinese Wall</i>).",
-      "Transferibilidad y Revocación": "Distintivo vinculado al cargo directivo e <b>intransferible</b>, sujeto a la gobernanza del Ecosistema Global."
+      "Obligaciones": "Supervisión legal y artística del sello, cumplimiento del estándar explícito <b>UAS</b> (Art. 38), respeto a los derechos morales de los artistas (Art. 13.1.d) y segregación de datos entre sedes (<i>Chinese Wall</i>)."
     }
   },
   "ownerAnimations.png": {
@@ -240,8 +228,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Identifica al Propietario o Jefatura Principal de la división <b>Grouvex Studios Animations</b>, dedicada a la producción audiovisual y animación.",
       "Cómo obtenerlo": "Asignación directa por titularidad o nombramiento ejecutivo como Propietario de Grouvex Studios Animations.",
       "Derechos": "Dirección creativa, técnica y operativa de la división de animación y gestión de sus equipos y producciones.",
-      "Obligaciones": "Aplicar la clasificación por edades (CCPME) y cortinillas de advertencia explícita (UAS) en archivos audiovisuales (Art. 38.3.c) y proteger los derechos de autor.",
-      "Transferibilidad y Revocación": "Distintivo vinculado al cargo directivo e <b>intransferible</b>, sujeto a la gobernanza del Ecosistema Global."
+      "Obligaciones": "Aplicar la clasificación por edades (CCPME) y cortinillas de advertencia explícita (UAS) en archivos audiovisuales (Art. 38.3.c) y proteger los derechos de autor."
     }
   },
   "ownerDesigns.png": {
@@ -251,8 +238,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Identifica al Propietario o Jefatura Principal de la sede secundaria <b>Grouvex Studios Designs (GSDesigns)</b>, especializada en diseño gráfico, identidad visual, UI/UX y portadas musicales o editoriales (Art. 6.2).",
       "Cómo obtenerlo": "Asignación directa por titularidad o nombramiento ejecutivo como Propietario de Grouvex Studios Designs (Art. 7).",
       "Derechos": "Dirección creativa y operativa de GSDesigns (Anexo II), gestión del equipo de diseñadores e ilustradores y propuesta de distinciones <i>Awards</i> (Art. 33).",
-      "Obligaciones": "Garantizar la originalidad y propiedad intelectual de los diseños, cumplir el etiquetado CCPM/UAS en activos visuales (Art. 38.3.b) y respetar el aislamiento de datos inter-sede.",
-      "Transferibilidad y Revocación": "Distintivo vinculado al cargo directivo e <b>intransferible</b>, sujeto a la gobernanza del Ecosistema Global."
+      "Obligaciones": "Garantizar la originalidad y propiedad intelectual de los diseños, cumplir el etiquetado CCPM/UAS en activos visuales (Art. 38.3.b) y respetar el aislamiento de datos inter-sede."
     }
   },
   "ownerGames.png": {
@@ -262,8 +248,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Identifica al Propietario o Jefatura Principal de la sede <b>Grouvex Studios Games (GSGames)</b>, enfocada en el desarrollo y publicación de videojuegos y software interactivo (Art. 6.3).",
       "Cómo obtenerlo": "Asignación directa por titularidad o nombramiento ejecutivo como Propietario de Grouvex Studios Games (Art. 7).",
       "Derechos": "Dirección de desarrollo y operativa de GSGames, gestión de equipos técnicos y propuesta de reconocimientos dentro de su división.",
-      "Obligaciones": "Implementar los estándares de clasificación PEGI/Kijkwijzer (Art. 37) y pantallas de advertencia UAS en ejecutables y software (Art. 38.3.d).",
-      "Transferibilidad y Revocación": "Distintivo vinculado al cargo directivo e <b>intransferible</b>, sujeto a la gobernanza del Ecosistema Global."
+      "Obligaciones": "Implementar los estándares de clasificación PEGI/Kijkwijzer (Art. 37) y pantallas de advertencia UAS en ejecutables y software (Art. 38.3.d)."
     }
   },
 
@@ -288,8 +273,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Creador musical o visual verificado dentro del ecosistema o sello <b>Grouvex Studios Records</b> que publica obras originales aprobadas conforme a los estándares de calidad y propiedad intelectual de la organización.",
       "Cómo obtenerlo": "Publicando material original aprobado bajo GSRecords o las plataformas oficiales de Grouvex Studios, acreditando la titularidad de derechos de autor y superando la validación de identidad.",
       "Derechos": "Reconocimiento de autoría y derechos morales (Art. 13.1.d), promoción preferencial y soporte técnico/legal prioritario en caso de contrato de exclusividad vigente (Art. 13.1.e), y elegibilidad para <i>Awards</i> de GSs (Art. 33).",
-      "Obligaciones": "Garantizar la autoría original de las obras, etiquetar correctamente la edad (<b>CCPME</b>) y advertencia explícita (<b>UAS</b>, Arts. 38 y 40), respetar la exclusividad pactada (Art. 13.2.d) y no recurrir a bots o compra de métricas (Art. 13.2.c).",
-      "Transferibilidad y Revocación": "Insignia personal e <b>intransferible</b>. Sujeta a degradación o revocación inmediata por plagio, crecimiento artificial de métricas, incumplimiento de exclusividad o falsificación de etiquetas de edad (Arts. 13.2, 23.5 y 40)."
+      "Obligaciones": "Garantizar la autoría original de las obras, etiquetar correctamente la edad (<b>CCPME</b>) y advertencia explícita (<b>UAS</b>, Arts. 38 y 40), respetar la exclusividad pactada (Art. 13.2.d) y no recurrir a bots o compra de métricas (Art. 13.2.c)."
     }
   },
   "verified-employee.gif": {
@@ -299,8 +283,7 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Personal contratado o colaborador activo con funciones operativas, técnicas o administrativas asignadas dentro de la estructura corporativa de Grouvex Studios o sus Organismos Secundarios.",
       "Cómo obtenerlo": "Superando el proceso de selección estandarizado (Art. 21) y manteniendo una vinculación laboral, contractual o de colaboración activa con estado <b>Aprobado</b> en el Registro de Miembros.",
       "Derechos": "Acreditación oficial mediante <b>TIGS</b>, planificación equitativa de carga laboral mediante créditos <b>EWHD</b> (1 EWHD = 12 horas reales), 30 días naturales de vacaciones anuales retribuidas, derecho a la desconexión digital (Art. 13.4) y acceso a formación en el Centro de Formación y Mentoría (CFM).",
-      "Obligaciones": "Portar y presentar su TIGS en interacciones y accesos internos (Art. 25), cumplir el código ético, respetar la segregación de información entre sedes (<i>Chinese Wall</i>) y proteger la confidencialidad de los datos de usuarios (Anexo I).",
-      "Transferibilidad y Revocación": "Distintivo corporativo e <b>intransferible</b>. Queda suspendido o revocado automáticamente si el estado del titular en el Registro pasa a <i>Suspendido</i>, <i>Denegada</i> o <i>Pendiente</i>, o por infracción grave (Arts. 23.5 y 24.4)."
+      "Obligaciones": "Portar y presentar su TIGS en interacciones y accesos internos (Art. 25), cumplir el código ético, respetar la segregación de información entre sedes (<i>Chinese Wall</i>) y proteger la confidencialidad de los datos de usuarios (Anexo I)."
     }
   },
   "GStudios_GCO.png": {
@@ -310,46 +293,46 @@ const INSIGNIAS_INICIALES = {
       "Descripción": "Distintivo operativo vinculado al <b>Sistema de Gestión de Continuidad Operacional (GCO)</b>, potestad ejecutiva delegada en el Equipo de Gestión para garantizar la estabilidad y sostenibilidad del Organismo Principal y sus Sedes ante eventos extraordinarios (Art. 41).",
       "Cómo obtenerlo": "Asignación corporativa al personal y agentes del Equipo de Gestión habilitados para operar protocolos de contingencia bajo los <b>Niveles de Alerta I (Amarillo), II (Naranja) y III (Rojo)</b> (Art. 43).",
       "Derechos": "Potestades extraordinarias durante activaciones GCO (Art. 42): reasignar recursos humanos y técnicos entre sedes, modificar plazos (SLA) y tiempos de respuesta (TAT), suspender temporalmente servicios o normativa interna (Nivel III) y desplegar sistemas automáticos de contingencia (Art. 45).",
-      "Obligaciones": "Notificar de inmediato a miembros y comunidad toda activación y desactivación del GCO, garantizar el retorno automático a la normalidad al cesar la causa y registrar todas las decisiones para auditoría interna (Art. 46).",
-      "Transferibilidad y Revocación": "Distintivo institucional e <b>intransferible</b>, sometido a auditoría interna y supervisión de la Dirección General."
+      "Obligaciones": "Notificar de inmediato a miembros y comunidad toda activación y desactivación del GCO, garantizar el retorno automático a la normalidad al cesar la causa y registrar todas las decisiones para auditoría interna (Art. 46)."
     }
   }
 };
 
 (function () {
-  // 0. Guardián de dominio: solo permitir grouvex.com y cualquier subdominio (*.grouvex.com)
+  const CONFIG = {
+    BASE_URL: "https://raw.githubusercontent.com/ecosistema-de-grouvex-studios/esistema.grouvex.github.io/refs/heads/main/imagen/sede/",
+    BASE_PATH: "/ecosistema-de-grouvex-studios/esistema.grouvex.github.io/refs/heads/main/imagen/sede/",
+    IMAGE_HOST: "raw.githubusercontent.com",
+    ALLOWED_DOMAINS: ["grouvex.com", "ecosistema-de-grouvex-studios.github.io"],
+    EXCLUDED_KEYWORDS: ["banner", "logo"],
+    ANIMATION_MS: 220
+  };
+
+  // 0. Guardián de dominio configurable
   const hostActual = (window.location.hostname || "").toLowerCase();
-  const esDominioAutorizado = hostActual === "grouvex.com" || hostActual.endsWith(".grouvex.com");
-  if (esDominioAutorizado) return;
+  const esDominioAutorizado = CONFIG.ALLOWED_DOMAINS.some(
+    (dominio) => hostActual === dominio || hostActual.endsWith(`.${dominio}`)
+  );
+  if (!esDominioAutorizado) return;
 
   if (window.__GS_BADGE_SYSTEM_INIT__) return;
   window.__GS_BADGE_SYSTEM_INIT__ = true;
 
-  const CONFIG = {
-    BASE_URL: "https://raw.githubusercontent.com/ecosistema-de-grouvex-studios/esistema.grouvex.github.io/refs/heads/main/imagen/sede/",
-    BASE_PATH: "/ecosistema-de-grouvex-studios/esistema.grouvex.github.io/refs/heads/main/imagen/sede/",
-    ALLOWED_HOST: "raw.githubusercontent.com",
-    ANIMATION_MS: 220,
-    DEFAULT_SIZE: 20
-  };
-
   let ultimoElementoEnfocado = null;
+  let insigniaActualArchivo = null;
   let rafPendiente = false;
   const colaNodosPendientes = new Set();
   const shadowRootsObservados = new WeakSet();
   const dbIndexada = new Map();
   const urlsPrecargadas = new Set();
+  const urlsRotas = new Set();
 
-  // Renderizado directo de HTML libre en campos (permite etiquetas, style="...", enlaces, botones, imágenes, etc.)
   function renderizarHTMLCampo(contenedor, htmlCrudo) {
     if (htmlCrudo instanceof Node) {
       contenedor.appendChild(htmlCrudo);
       return;
     }
-
     contenedor.innerHTML = String(htmlCrudo ?? "");
-
-    // Añadir rel="noopener noreferrer" solo en enlaces externos que abran en nueva pestaña sin rel definido
     contenedor.querySelectorAll('a[target="_blank"]').forEach((enlace) => {
       if (!enlace.hasAttribute("rel")) {
         enlace.setAttribute("rel", "noopener noreferrer");
@@ -357,7 +340,6 @@ const INSIGNIAS_INICIALES = {
     });
   }
 
-  // Escudo SVG unificado (estilo 403 / No disponible)
   function generarEscudo403SVG() {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
       <defs>
@@ -371,7 +353,6 @@ const INSIGNIAS_INICIALES = {
       <circle cx="32" cy="31" r="10.5" fill="none" stroke="#e4e4e7" stroke-width="2.6"/>
       <line x1="24.8" y1="23.8" x2="39.2" y2="38.2" stroke="#e4e4e7" stroke-width="2.6" stroke-linecap="round"/>
     </svg>`;
-
     return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
   }
 
@@ -386,7 +367,6 @@ const INSIGNIAS_INICIALES = {
       .trim();
 
     if (!limpio) return "Insignia Oficial";
-
     return limpio
       .split(" ")
       .map((palabra) =>
@@ -405,7 +385,6 @@ const INSIGNIAS_INICIALES = {
     }
   }
 
-  // Proxy reactivo
   const baseDatosTarget = { ...INSIGNIAS_INICIALES, ...(window.DB_INSIGNIAS || {}) };
   window.DB_INSIGNIAS = new Proxy(baseDatosTarget, {
     set(target, prop, value) {
@@ -433,13 +412,12 @@ const INSIGNIAS_INICIALES = {
       const pathnameLower = url.pathname.toLowerCase();
       const baseLower = CONFIG.BASE_PATH.toLowerCase();
 
-      if (url.hostname === CONFIG.ALLOWED_HOST && pathnameLower.startsWith(baseLower)) {
+      if (url.hostname === CONFIG.IMAGE_HOST && pathnameLower.startsWith(baseLower)) {
         const archivoOriginal = decodeURIComponent(url.pathname.slice(CONFIG.BASE_PATH.length));
         if (!archivoOriginal || archivoOriginal.includes("/")) return null;
 
-        // Ignorar archivos que contengan "banner" o "logo" en su nombre
         const archivoLower = archivoOriginal.toLowerCase();
-        if (archivoLower.includes("banner") || archivoLower.includes("logo")) return null;
+        if (CONFIG.EXCLUDED_KEYWORDS.some((kw) => archivoLower.includes(kw))) return null;
 
         const encontrada = dbIndexada.get(archivoLower);
         if (encontrada) return encontrada;
@@ -458,7 +436,18 @@ const INSIGNIAS_INICIALES = {
     return null;
   }
 
-  // 1. Estilos CSS Unificados + Estilos base para HTML dentro de los campos
+  function obtenerInsigniasEnPagina() {
+    const vistas = new Map();
+    document.querySelectorAll("img.gs-badge-clickable").forEach((img) => {
+      const src = img.dataset.gsOriginalSrc || img.getAttribute("src") || img.src;
+      const datos = obtenerDatosInsignia(src);
+      if (datos && !vistas.has(datos.archivo)) {
+        vistas.set(datos.archivo, { src, datos, elemento: img });
+      }
+    });
+    return Array.from(vistas.values());
+  }
+
   function inyectarEstilos() {
     if (document.getElementById("gs-insignia-styles")) return;
     const style = document.createElement("style");
@@ -466,9 +455,6 @@ const INSIGNIAS_INICIALES = {
     style.textContent = `
       .gs-badge-clickable {
         cursor: pointer;
-        border-radius: 5px;
-        vertical-align: middle;
-        object-fit: contain;
         user-select: none;
         -webkit-user-select: none;
         -webkit-touch-callout: none;
@@ -512,10 +498,10 @@ const INSIGNIAS_INICIALES = {
       .gs-badge-modal-box {
         background: linear-gradient(180deg, #1b1b20 0%, #111114 100%);
         color: #f4f4f5;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: 20px;
         width: 100%;
-        max-width: 430px;
+        max-width: 440px;
         max-height: 86vh;
         overflow-y: auto;
         position: relative;
@@ -562,25 +548,38 @@ const INSIGNIAS_INICIALES = {
         .gs-badge-drag-pill { display: block; }
       }
 
-      .gs-badge-close {
-        position: absolute;
-        top: 14px;
-        right: 14px;
+      .gs-badge-close,
+      .gs-badge-nav-btn {
         width: 32px;
         height: 32px;
         border-radius: 10px;
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.08);
         color: #a1a1aa;
-        font-size: 19px;
+        font-size: 18px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         transition: all 0.16s ease;
       }
+      .gs-badge-close {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        font-size: 19px;
+      }
+      .gs-badge-nav-group {
+        position: absolute;
+        top: 14px;
+        left: 14px;
+        display: flex;
+        gap: 6px;
+      }
       .gs-badge-close:hover,
-      .gs-badge-close:focus-visible {
+      .gs-badge-close:focus-visible,
+      .gs-badge-nav-btn:hover,
+      .gs-badge-nav-btn:focus-visible {
         background: rgba(255, 255, 255, 0.14);
         color: #ffffff;
         outline: none;
@@ -591,7 +590,7 @@ const INSIGNIAS_INICIALES = {
         height: 84px;
         border-radius: 22px;
         background: linear-gradient(145deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.015) 100%);
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.14);
         box-shadow:
           0 12px 28px -8px rgba(0, 0, 0, 0.65),
           0 1px 0 rgba(255, 255, 255, 0.12) inset;
@@ -614,7 +613,7 @@ const INSIGNIAS_INICIALES = {
         letter-spacing: 0.1em;
         color: #d4d4d8;
         background: rgba(255, 255, 255, 0.07);
-        border: 1px solid rgba(255, 255, 255, 0.11);
+        border: 1px solid rgba(255, 255, 255, 0.12);
         padding: 3px 11px;
         border-radius: 99px;
         margin-bottom: 8px;
@@ -639,7 +638,6 @@ const INSIGNIAS_INICIALES = {
         border-radius: 8px;
       }
 
-      /* Cuerpo de acordeones */
       .gs-badge-body {
         padding: 18px 22px 6px;
       }
@@ -706,7 +704,6 @@ const INSIGNIAS_INICIALES = {
         word-break: break-word;
         animation: gsSlideDown 0.18s ease-out;
       }
-      /* Estilo por defecto para enlaces sin color inline */
       .gs-badge-accordion-content a:not([style*="color"]) {
         color: #ffffff;
       }
@@ -714,27 +711,6 @@ const INSIGNIAS_INICIALES = {
         font-weight: 600;
         text-decoration: underline;
         text-underline-offset: 3px;
-        transition: opacity 0.15s ease;
-      }
-      .gs-badge-accordion-content a:hover {
-        opacity: 0.85;
-      }
-      .gs-badge-accordion-content ul,
-      .gs-badge-accordion-content ol {
-        margin: 6px 0;
-        padding-left: 18px;
-      }
-      .gs-badge-accordion-content img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 8px;
-      }
-      .gs-badge-accordion-content code {
-        background: rgba(255, 255, 255, 0.08);
-        padding: 2px 6px;
-        border-radius: 5px;
-        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-        font-size: 0.82rem;
       }
 
       @keyframes gsSlideDown {
@@ -742,7 +718,6 @@ const INSIGNIAS_INICIALES = {
         to { opacity: 1; transform: translateY(0); }
       }
 
-      /* Pie del modal */
       .gs-badge-footer {
         padding: 14px 22px 18px;
         display: flex;
@@ -788,6 +763,7 @@ const INSIGNIAS_INICIALES = {
         #gs-badge-modal-overlay,
         .gs-badge-modal-box,
         .gs-badge-close,
+        .gs-badge-nav-btn,
         .gs-badge-accordion summary::after,
         .gs-badge-accordion-content {
           transition: none !important;
@@ -798,7 +774,17 @@ const INSIGNIAS_INICIALES = {
     document.head.appendChild(style);
   }
 
-  // 2. Crear estructura del modal
+  function navegarInsignia(direccion) {
+    const lista = obtenerInsigniasEnPagina();
+    if (lista.length <= 1) return;
+    const idxActual = lista.findIndex((item) => item.datos.archivo === insigniaActualArchivo);
+    const siguienteIdx = idxActual === -1
+      ? 0
+      : (idxActual + direccion + lista.length) % lista.length;
+    const destino = lista[siguienteIdx];
+    abrirModal(destino.src, destino.datos, destino.elemento);
+  }
+
   function crearModal() {
     if (document.getElementById("gs-badge-modal-overlay")) return;
     const overlay = document.createElement("div");
@@ -807,6 +793,10 @@ const INSIGNIAS_INICIALES = {
       <div class="gs-badge-modal-box" role="dialog" aria-modal="true" aria-labelledby="gs-modal-title">
         <div class="gs-badge-hero">
           <div class="gs-badge-drag-pill" aria-hidden="true"></div>
+          <div id="gs-modal-nav" class="gs-badge-nav-group" style="display:none;">
+            <button type="button" id="gs-modal-prev" class="gs-badge-nav-btn" aria-label="Insignia anterior" title="Anterior (←)">&#8249;</button>
+            <button type="button" id="gs-modal-next" class="gs-badge-nav-btn" aria-label="Siguiente insignia" title="Siguiente (→)">&#8250;</button>
+          </div>
           <button type="button" class="gs-badge-close" aria-label="Cerrar ventana de insignia" title="Cerrar (Esc)">&times;</button>
           <div class="gs-badge-pedestal">
             <img id="gs-modal-img" src="" alt="" draggable="false">
@@ -826,9 +816,14 @@ const INSIGNIAS_INICIALES = {
 
     const box = overlay.querySelector(".gs-badge-modal-box");
     const btnClose = overlay.querySelector(".gs-badge-close");
+    const btnPrev = overlay.querySelector("#gs-modal-prev");
+    const btnNext = overlay.querySelector("#gs-modal-next");
     const btnCopy = overlay.querySelector("#gs-modal-copy-id");
 
     btnClose.addEventListener("click", cerrarModal);
+    btnPrev.addEventListener("click", () => navegarInsignia(-1));
+    btnNext.addEventListener("click", () => navegarInsignia(1));
+
     overlay.addEventListener("click", (e) => {
       if (e.target === overlay) cerrarModal();
     });
@@ -843,7 +838,7 @@ const INSIGNIAS_INICIALES = {
       } catch (_) {}
     });
 
-    // Gesto Swipe-to-Close en pantallas táctiles
+    // Swipe-to-Close en móvil
     let touchStartY = 0;
     let touchDeltaY = 0;
 
@@ -867,14 +862,12 @@ const INSIGNIAS_INICIALES = {
       if (!touchStartY) return;
       box.style.transition = "";
       box.style.transform = "";
-      if (touchDeltaY > 95 && box.scrollTop <= 0) {
-        cerrarModal();
-      }
+      if (touchDeltaY > 95 && box.scrollTop <= 0) cerrarModal();
       touchStartY = 0;
       touchDeltaY = 0;
     });
 
-    // Accesibilidad teclado (Esc + Focus Trap)
+    // Teclado: Esc, flechas izquierda/derecha y Focus Trap
     document.addEventListener("keydown", (e) => {
       if (!overlay.classList.contains("active")) return;
 
@@ -882,9 +875,16 @@ const INSIGNIAS_INICIALES = {
         cerrarModal();
         return;
       }
-
+      if (e.key === "ArrowLeft" && document.activeElement?.tagName !== "SUMMARY") {
+        navegarInsignia(-1);
+        return;
+      }
+      if (e.key === "ArrowRight" && document.activeElement?.tagName !== "SUMMARY") {
+        navegarInsignia(1);
+        return;
+      }
       if (e.key === "Tab") {
-        const focusables = box.querySelectorAll('a[href], button, summary, input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        const focusables = box.querySelectorAll('a[href], button:not([disabled]), summary, [tabindex]:not([tabindex="-1"])');
         if (!focusables.length) return;
         const primero = focusables[0];
         const ultimo = focusables[focusables.length - 1];
@@ -906,6 +906,7 @@ const INSIGNIAS_INICIALES = {
 
     overlay.classList.add("closing");
     document.body.style.overflow = "";
+    insigniaActualArchivo = null;
 
     setTimeout(() => {
       overlay.classList.remove("active", "closing");
@@ -915,7 +916,6 @@ const INSIGNIAS_INICIALES = {
     }, CONFIG.ANIMATION_MS);
   }
 
-  // 3. Rellenar y abrir modal
   function abrirModal(srcOriginal, datos, elementoOrigen) {
     const overlay = document.getElementById("gs-badge-modal-overlay");
     const imgEl = document.getElementById("gs-modal-img");
@@ -923,11 +923,18 @@ const INSIGNIAS_INICIALES = {
     const titleEl = document.getElementById("gs-modal-title");
     const statusEl = document.getElementById("gs-modal-status");
     const fieldsContainer = document.getElementById("gs-modal-fields");
+    const navGroup = document.getElementById("gs-modal-nav");
     const btnCopy = document.getElementById("gs-modal-copy-id");
 
-    ultimoElementoEnfocado = elementoOrigen || document.activeElement;
+    if (!insigniaActualArchivo) {
+      ultimoElementoEnfocado = elementoOrigen || document.activeElement;
+    }
+    insigniaActualArchivo = datos.archivo;
 
-    const yaFallo = Boolean(elementoOrigen?.dataset?.gsImageBroken);
+    const insigniasEnPagina = obtenerInsigniasEnPagina();
+    navGroup.style.display = insigniasEnPagina.length > 1 ? "flex" : "none";
+
+    const yaFallo = Boolean(elementoOrigen?.dataset?.gsImageBroken) || urlsRotas.has(srcOriginal);
 
     imgEl.onerror = null;
     if (yaFallo) {
@@ -940,6 +947,7 @@ const INSIGNIAS_INICIALES = {
       imgEl.alt = `Insignia oficial: ${datos.nombre}`;
       statusEl.style.display = "none";
       imgEl.onerror = () => {
+        urlsRotas.add(srcOriginal);
         imgEl.onerror = null;
         imgEl.src = ESCUDO_403_URI;
         imgEl.alt = `Insignia no disponible: ${datos.nombre}`;
@@ -963,8 +971,17 @@ const INSIGNIAS_INICIALES = {
 
     fieldsContainer.innerHTML = "";
 
-    const entradasCampos =
-      datos.campos && typeof datos.campos === "object" ? Object.entries(datos.campos) : [];
+    const camposCombinados = datos.campos && typeof datos.campos === "object"
+      ? {
+          ...datos.campos,
+          ...REGLAS_COMUNES_INSIGNIA,
+          ...(datos.campos["Transferibilidad y Revocación"]
+            ? { "Transferibilidad y Revocación": datos.campos["Transferibilidad y Revocación"] }
+            : {})
+        }
+      : null;
+
+    const entradasCampos = camposCombinados ? Object.entries(camposCombinados) : [];
 
     if (entradasCampos.length > 0) {
       fieldsContainer.style.display = "block";
@@ -1004,7 +1021,8 @@ const INSIGNIAS_INICIALES = {
     });
   }
 
-  function aplicarFallbackNoDisponible(img, datos) {
+  function aplicarFallbackNoDisponible(img, datos, srcOriginal) {
+    if (srcOriginal) urlsRotas.add(srcOriginal);
     if (img.dataset.gsImageBroken === "true") return;
     img.dataset.gsImageBroken = "true";
     if (!img.dataset.gsOriginalSrc && !img.src.startsWith("data:")) {
@@ -1014,8 +1032,7 @@ const INSIGNIAS_INICIALES = {
     img.src = ESCUDO_403_URI;
   }
 
-  // 4. Auto-enriquecimiento completo de <img>
-  function enriquecerAtributosImagen(img, datos) {
+  function enriquecerAtributosImagen(img, datos, srcOriginal) {
     const etiquetaCompleta = datos.categoria
       ? `${datos.nombre} (${datos.categoria})`
       : datos.nombre;
@@ -1026,16 +1043,9 @@ const INSIGNIAS_INICIALES = {
     if (!img.hasAttribute("aria-label")) {
       img.setAttribute("aria-label", `Insignia ${etiquetaCompleta}. Pulsa para ver detalles.`);
     }
-    if (!img.hasAttribute("aria-haspopup")) {
-      img.setAttribute("aria-haspopup", "dialog");
-    }
-    if (!img.hasAttribute("role")) {
-      img.setAttribute("role", "button");
-    }
-    if (!img.hasAttribute("tabindex")) {
-      img.setAttribute("tabindex", "0");
-    }
-
+    if (!img.hasAttribute("aria-haspopup")) img.setAttribute("aria-haspopup", "dialog");
+    if (!img.hasAttribute("role")) img.setAttribute("role", "button");
+    if (!img.hasAttribute("tabindex")) img.setAttribute("tabindex", "0");
     if (!img.hasAttribute("title") || img.getAttribute("title").trim() === "") {
       img.setAttribute("title", etiquetaCompleta);
     }
@@ -1045,13 +1055,6 @@ const INSIGNIAS_INICIALES = {
     if (!img.hasAttribute("draggable")) img.setAttribute("draggable", "false");
     if (!img.hasAttribute("referrerpolicy")) img.setAttribute("referrerpolicy", "no-referrer");
 
-    const tieneDimensionesAtributo = img.hasAttribute("width") || img.hasAttribute("height");
-    const tieneDimensionesEstilo = Boolean(img.style.width || img.style.height);
-    if (!tieneDimensionesAtributo && !tieneDimensionesEstilo) {
-      img.setAttribute("width", String(CONFIG.DEFAULT_SIZE));
-      img.setAttribute("height", String(CONFIG.DEFAULT_SIZE));
-    }
-
     img.dataset.gsBadgeName = datos.nombre;
     if (datos.categoria) {
       img.dataset.gsBadgeCategory = datos.categoria;
@@ -1059,8 +1062,8 @@ const INSIGNIAS_INICIALES = {
       delete img.dataset.gsBadgeCategory;
     }
 
-    if (img.complete && img.naturalWidth === 0 && !img.src.startsWith("data:")) {
-      aplicarFallbackNoDisponible(img, datos);
+    if (urlsRotas.has(srcOriginal) || (img.complete && img.naturalWidth === 0 && !img.src.startsWith("data:"))) {
+      aplicarFallbackNoDisponible(img, datos, srcOriginal);
       return;
     }
 
@@ -1068,7 +1071,7 @@ const INSIGNIAS_INICIALES = {
       img.dataset.gsErrorHandled = "true";
       img.addEventListener(
         "error",
-        () => aplicarFallbackNoDisponible(img, datos),
+        () => aplicarFallbackNoDisponible(img, datos, srcOriginal),
         { once: true }
       );
     }
@@ -1088,6 +1091,11 @@ const INSIGNIAS_INICIALES = {
   function marcarImagen(img) {
     if (!(img instanceof HTMLImageElement)) return;
 
+    if (img.hasAttribute("data-no-badge")) {
+      if (img.dataset.gsBadgeProcesada) limpiarAtributosImagen(img);
+      return;
+    }
+
     const srcEvaluar = img.dataset.gsOriginalSrc || img.getAttribute("src") || img.src;
     const datos = obtenerDatosInsignia(srcEvaluar);
 
@@ -1101,7 +1109,7 @@ const INSIGNIAS_INICIALES = {
 
     img.dataset.gsBadgeProcesada = estadoMarca;
     img.classList.add("gs-badge-clickable");
-    enriquecerAtributosImagen(img, datos);
+    enriquecerAtributosImagen(img, datos, srcEvaluar);
   }
 
   function procesarImagenes(raiz = document) {
@@ -1112,7 +1120,6 @@ const INSIGNIAS_INICIALES = {
     if (!raiz.querySelectorAll) return;
 
     raiz.querySelectorAll("img").forEach(marcarImagen);
-
     raiz.querySelectorAll("*").forEach((el) => {
       if (el.shadowRoot) {
         observarRaiz(el.shadowRoot);
@@ -1141,9 +1148,9 @@ const INSIGNIAS_INICIALES = {
 
     const observer = new MutationObserver((mutaciones) => {
       for (const mutacion of mutaciones) {
-        if (mutacion.type === "attributes" && mutacion.attributeName === "src") {
+        if (mutacion.type === "attributes") {
           const img = mutacion.target;
-          if (!img.src.startsWith("data:")) {
+          if (mutacion.attributeName === "src" && !img.src.startsWith("data:")) {
             delete img.dataset.gsOriginalSrc;
             delete img.dataset.gsImageBroken;
           }
@@ -1162,11 +1169,10 @@ const INSIGNIAS_INICIALES = {
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ["src"]
+      attributeFilter: ["src", "data-no-badge"]
     });
   }
 
-  // 5. Delegación global de eventos + Precarga
   function registrarDelegacionEventos() {
     const buscarInsigniaEnEvento = (e) => {
       const ruta = e.composedPath ? e.composedPath() : [e.target];
@@ -1199,7 +1205,7 @@ const INSIGNIAS_INICIALES = {
       const img = buscarInsigniaEnEvento(e);
       if (!img || img.dataset.gsImageBroken === "true") return;
       const src = img.dataset.gsOriginalSrc || img.src;
-      if (src && !src.startsWith("data:") && !urlsPrecargadas.has(src)) {
+      if (src && !src.startsWith("data:") && !urlsPrecargadas.has(src) && !urlsRotas.has(src)) {
         urlsPrecargadas.add(src);
         const preloader = new Image();
         preloader.src = src;
@@ -1207,7 +1213,17 @@ const INSIGNIAS_INICIALES = {
     }, true);
   }
 
-  // 6. Inicialización
+  function comprobarDeepLink() {
+    const params = new URLSearchParams(window.location.search);
+    let archivo = params.get("insignia");
+    if (!archivo && window.location.hash.startsWith("#insignia=")) {
+      archivo = decodeURIComponent(window.location.hash.slice("#insignia=".length));
+    }
+    if (archivo) {
+      window.GSInsignias.abrir(archivo);
+    }
+  }
+
   function iniciar() {
     indexarBaseDeDatos();
     inyectarEstilos();
@@ -1215,6 +1231,7 @@ const INSIGNIAS_INICIALES = {
     registrarDelegacionEventos();
     procesarImagenes(document);
     observarRaiz(document.body);
+    comprobarDeepLink();
   }
 
   window.GSInsignias = {
