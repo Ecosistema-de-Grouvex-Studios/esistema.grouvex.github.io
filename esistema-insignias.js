@@ -307,7 +307,7 @@ const INSIGNIAS_INICIALES = {
   const esDominioAutorizado = CONFIG.ALLOWED_DOMAINS.some(
     (dominio) => hostActual === dominio || hostActual.endsWith(`.${dominio}`)
   );
-  if (esDominioAutorizado) return;
+  if (!esDominioAutorizado) return;
 
   if (window.__GS_BADGE_SYSTEM_INIT__) return;
   window.__GS_BADGE_SYSTEM_INIT__ = true;
