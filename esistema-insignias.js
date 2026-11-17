@@ -1,7 +1,6 @@
 /**
  * Sistema de Insignias - Ecosistema Grouvex Studios
- * Versión 7.4 - Catálogo optimizado (overflow unificado, sin ID en tarjetas, sin contador de recuento,
- * ancho de tarjetas uniforme y navegación inferior mantenida).
+ * Versión 7.5 - Catálogo optimizado + soporte de insignias deshabilitadas.
  */
 
 const REGLAS_COMUNES_INSIGNIA = {
@@ -15,7 +14,8 @@ const INSIGNIAS_INICIALES = {
   // =========================================================================
   "verified.png": {
     nombre: "Usuario Verificado",
-    categoria: "Comunidad",
+    categoria: "Usuarios",
+    disabled: false,
     campos: {
       "Descripción": "Certifica que el usuario es una persona física real registrada en la Base de Datos con estado <b>Aprobado</b>, habiendo superado la validación de identidad exigida por el Departamento Legal y garantizando que no es un perfil automatizado o bot (Art. 23.4).",
       "Cómo obtenerlo": "Registrándose en la plataforma de Grouvex Studios, aportando los datos mínimos de registro y obteniendo la aprobación de estado en la Base de Datos (solo se obtiene <b>1 vez por usuario</b>, Art. 22).",
@@ -25,7 +25,8 @@ const INSIGNIAS_INICIALES = {
   },
   "vip.png": {
     nombre: "VIP",
-    categoria: "Membresía",
+    categoria: "Miembros",
+    disabled: true,
     campos: {
       "Descripción": "Distintivo de perfil que acredita la suscripción o titularidad activa de un plan de nivel superior dentro de los organismos del ecosistema.",
       "Cómo obtenerlo": "Disponiendo activamente del <b>Plan Estándar o superior</b> en cualquier organismo de Grouvex Studios (ej. GSRecords o GSDesigns).",
@@ -37,9 +38,10 @@ const INSIGNIAS_INICIALES = {
   // =========================================================================
   // ARTÍCULO 22.1. INSIGNIAS DE CAZADOR DE ERRORES
   // =========================================================================
-  "verified-bughunter.gif": {
+  "BugHunter.png": {
     nombre: "Cazador de Errores",
-    categoria: "Seguridad y Desarrollo",
+    categoria: "C.Errores y Desarrollo",
+    disabled: true,
     campos: {
       "Descripción": "Reconocimiento oficial a los miembros que identifican errores de código, fallos técnicos o vulnerabilidades de seguridad en las plataformas y sistemas del Ecosistema de Grouvex Studios.",
       "Cómo obtenerlo": "Identificando errores de código o fallos reproducibles y reportándolos formalmente a través del repositorio oficial en <b>GitHub Grouvex Studios</b>.",
@@ -47,9 +49,10 @@ const INSIGNIAS_INICIALES = {
       "Obligaciones": "Actuar de buena fe, no explotar las vulnerabilidades detectadas ni comprometer la confidencialidad o integridad de los sistemas y datos de usuarios (Art. 13.2.a)."
     }
   },
-  "bughunter-expert.png": {
+  "verified-bughunter.gif": {
     nombre: "Cazador de Errores Experto",
-    categoria: "Seguridad y Desarrollo",
+    categoria: "C.Errores y Desarrollo",
+    disabled: true,
     campos: {
       "Descripción": "Grado avanzado otorgado a cazadores de errores con trayectoria destacada y colaboración continua en la resolución y mejora técnica del ecosistema.",
       "Cómo obtenerlo": "Cumpliendo todos los requisitos de <i>Cazador de Errores</i> (reporte de fallos de código en <b>GitHub Grouvex Studios</b>), ayudando activamente al equipo técnico y manteniendo una <b>actividad constante</b>.",
@@ -61,9 +64,10 @@ const INSIGNIAS_INICIALES = {
   // =========================================================================
   // ARTÍCULO 22.2. INSIGNIAS DE DESARROLLADORES O PROGRAMADORES
   // =========================================================================
-  "desarrollador.png": {
+  "developer.png": {
     nombre: "Desarrollador",
-    categoria: "Desarrollo Técnico",
+    categoria: "C.Errores y Desarrollo",
+    disabled: true,
     campos: {
       "Descripción": "Distintivo otorgado a los programadores y colaboradores técnicos que contribuyen directamente al código fuente de la plataforma web.",
       "Cómo obtenerlo": "Modificando o creando código aprobado para mejorar la <b>página web</b> oficial de Grouvex Studios.",
@@ -71,9 +75,10 @@ const INSIGNIAS_INICIALES = {
       "Obligaciones": "Respetar los estándares de calidad, seguridad y propiedad intelectual del repositorio, sin introducir código malicioso ni vulnerabilidades."
     }
   },
-  "desarrollador-experimentado.png": {
+  "verified-developer-a.gif": {
     nombre: "Desarrollador Experimentado",
-    categoria: "Equipo Headquarters",
+    categoria: "C.Errores y Desarrollo",
+    disabled: true,
     campos: {
       "Descripción": "Reconocimiento técnico superior para desarrolladores con amplia experiencia que aportan arquitectura y software más allá del entorno web, integrados dentro del <b>Equipo Headquarters</b>.",
       "Cómo obtenerlo": "Cumpliendo los requisitos de <i>Desarrollador</i>, demostrando mayor experiencia mediante desarrollos de código fuera de la página web y superando las <b>pruebas del Equipo Headquarters de moderadores</b>.",
@@ -85,9 +90,10 @@ const INSIGNIAS_INICIALES = {
   // =========================================================================
   // ARTÍCULO 22.3. INSIGNIAS DE SOCIOS (PARTNERS)
   // =========================================================================
-  "socio.png": {
+  "partner.png": {
     nombre: "Socio",
     categoria: "Partners",
+    disabled: false,
     campos: {
       "Descripción": "Distintivo que reconoce la permanencia, fidelidad y apoyo continuo de un miembro hacia Grouvex Studios, sus proyectos y su comunidad.",
       "Cómo obtenerlo": "Siendo socio de Grouvex Studios durante al menos <b>1 año</b> y demostrando apoyo activo a la organización, sus proyectos y sus miembros.",
@@ -95,9 +101,10 @@ const INSIGNIAS_INICIALES = {
       "Obligaciones": "Mantener una conducta ejemplar, apoyar los valores de la comunidad y respetar los Términos de Servicio y Políticas de Privacidad."
     }
   },
-  "socio-experimentado.png": {
+  "verified-partner.gif": {
     nombre: "Socio Experimentado",
     categoria: "Partners",
+    disabled: false,
     campos: {
       "Descripción": "Reconocimiento de máxima fidelidad para socios veteranos con trayectoria prolongada de respaldo continuo a todo el ecosistema de Grouvex Studios.",
       "Cómo obtenerlo": "Contando con una antigüedad superior al mínimo de <b>1 año como Socio</b> y manteniendo un apoyo sostenido a Grouvex Studios, sus proyectos y miembros.",
@@ -105,37 +112,10 @@ const INSIGNIAS_INICIALES = {
       "Obligaciones": "Conservar el compromiso ético, el respeto comunitario y la integridad exigida a todos los miembros acreditados."
     }
   },
-
-  // =========================================================================
-  // ARTÍCULO 23. INSIGNIAS DEL EQUIPO HEADQUARTERS
-  // =========================================================================
-  "miembro-verificado.png": {
-    nombre: "Miembro Verificado",
-    categoria: "Equipo Headquarters",
-    campos: {
-      "Descripción": "Acreditación base de pertenencia aprobada al equipo institucional de Grouvex Studios dentro de la web oficial y la Tarjeta de Identidad (TIGS, Art. 26.1.5).",
-      "Cómo obtenerlo": "Estando registrado en la Página Web oficial y obteniendo la aprobación expresa del equipo de Grouvex Studios como miembro acreditado.",
-      "Derechos": "Identificación oficial como miembro en la TIGS, acceso a canales internos y garantías laborales y de descanso del Art. 13.4.",
-      "Obligaciones": "Cumplir las directrices del Boletín Oficial, respetar la privacidad de los usuarios y mantener la veracidad en su registro."
-    }
-  },
-  "verified-team.png": {
-    nombre: "Equipo Verificado",
-    categoria: "Equipo Headquarters",
-    campos: {
-      "Descripción": "Distintivo general que acredita a los miembros activos integrados en la estructura operativa del Equipo Headquarters de Grouvex Studios.",
-      "Cómo obtenerlo": "Superando el proceso de selección formal (Art. 21) y las pruebas de acceso establecidas por el Equipo Headquarters.",
-      "Derechos": "Acceso al panel de control operativo, emisión de TIGS acreditativa (Art. 24.3), 30 días naturales de vacaciones retribuidas y derecho a la desconexión digital (Art. 13.4).",
-      "Obligaciones": "Desempeñar sus funciones con diligencia, mantener confidencialidad absoluta y portar la TIGS en actuaciones oficiales (Art. 25)."
-    }
-  },
-
-  // =========================================================================
-  // ARTÍCULO 23.1. INSIGNIAS DEL EQUIPO DE MODERACIÓN
-  // =========================================================================
-  "moderador-aprendiz.png": {
+  "trial-moderator.png": {
     nombre: "Moderador Aprendiz",
-    categoria: "Equipo de Moderación",
+    categoria: "Equipo Agentes",
+    disabled: true,
     campos: {
       "Descripción": "Rango inicial del cuerpo de moderación encargado de asistir al equipo y brindar atención directa de soporte a los miembros de la comunidad.",
       "Cómo obtenerlo": "Aprobando el <b>test de acceso para moderador</b> y colaborando activamente en las tareas requeridas y atención de Soporte.",
@@ -143,9 +123,21 @@ const INSIGNIAS_INICIALES = {
       "Obligaciones": "Asistir en tareas de soporte comunitario, seguir las instrucciones de moderadores y administradores, y aplicar un trato equitativo y respetuoso (Art. 13.1.c)."
     }
   },
-  "moderador.png": {
+  "verified-team.png": {
+    nombre: "Agente Verificado",
+    categoria: "Equipo Agentes",
+    disabled: false,
+    campos: {
+      "Descripción": "Distintivo general que acredita a los miembros activos integrados en la estructura operativa del Equipo Headquarters de Grouvex Studios.",
+      "Cómo obtenerlo": "Superando el proceso de selección formal (Art. 21) y las pruebas de acceso establecidas por el Equipo Headquarters.",
+      "Derechos": "Acceso al panel de control operativo, emisión de TIGS acreditativa (Art. 24.3), 30 días naturales de vacaciones retribuidas y derecho a la desconexión digital (Art. 13.4).",
+      "Obligaciones": "Desempeñar sus funciones con diligencia, mantener confidencialidad absoluta y portar la TIGS en actuaciones oficiales (Art. 25)."
+    }
+  },
+  "moderator.png": {
     nombre: "Moderador",
-    categoria: "Equipo de Moderación",
+    categoria: "Equipo Agentes",
+    disabled: false,
     campos: {
       "Descripción": "Agente operativo encargado de velar por la seguridad de los miembros y atender y resolver sus asuntos dentro de Grouvex Studios y sus sedes derivadas.",
       "Cómo obtenerlo": "Superando la etapa de aprendizaje y obteniendo una <b>aprobación por voto de 2/5</b> ponderada entre los miembros habilitados (50% Moderadores/Superiores, 30% rango intermedio y 20% rango base).",
@@ -153,9 +145,10 @@ const INSIGNIAS_INICIALES = {
       "Obligaciones": "Velar por la seguridad de la comunidad, respetar el debido proceso y el derecho de audiencia de 72 horas ante sanciones (Art. 13.3.c) y presentar su TIGS cuando se requiera."
     }
   },
-  "moderador-experimentado.png": {
+  "verified-moderator.gif": {
     nombre: "Moderador Experimentado",
-    categoria: "Equipo de Moderación",
+    categoria: "Sistema y Jefatura",
+    disabled: false,
     campos: {
       "Descripción": "Rango senior de moderación con trayectoria consolidada, actividad constante y participación en tareas de apoyo administrativo.",
       "Cómo obtenerlo": "Cumpliendo todos los requisitos de <i>Moderador</i>, realizando tareas de ámbito administrativo, manteniendo una <b>actividad constante</b> y obteniendo una <b>aprobación por voto de 3/5</b>.",
@@ -167,9 +160,10 @@ const INSIGNIAS_INICIALES = {
   // =========================================================================
   // ARTÍCULO 23.2. INSIGNIAS DEL EQUIPO DE ADMINISTRADORES / JEFE
   // =========================================================================
-  "administrador.png": {
+  "employee.png": {
     nombre: "Administrador",
-    categoria: "Equipo de Administradores",
+    categoria: "Equipo Agentes",
+    disabled: false,
     campos: {
       "Descripción": "Cargo de gestión superior con autoridad administrativa sobre plataformas, registros, normativas y equipos operativos de Grouvex Studios.",
       "Cómo obtenerlo": "Poseyendo la insignia de <i>Moderador Experimentado</i> (o equivalente habilitante) y obteniendo una <b>aprobación por voto de 4/5</b> (ponderada al 40% y 60% según rango votante).",
@@ -177,9 +171,10 @@ const INSIGNIAS_INICIALES = {
       "Obligaciones": "Garantizar el cumplimiento legal y normativo, respetar los derechos ARCO y privacidad de datos (Anexo I) y actuar bajo el principio de debido proceso."
     }
   },
-  "administrador-experimentado.png": {
+  "verified-employee.gif": {
     nombre: "Administrador Experimentado",
-    categoria: "Equipo de Administradores",
+    categoria: "Sistema y Jefatura",
+    disabled: false,
     campos: {
       "Descripción": "Rango directivo dentro del cuerpo de administración que acredita amplia trayectoria y dominio operativo en Grouvex Studios y todas sus sedes derivadas.",
       "Cómo obtenerlo": "Cumpliendo todos los requisitos de <i>Administrador</i> y acreditando sólida <b>experiencia en Grouvex Studios y sus derivadas</b> (GSRecords, GSDesigns, GSGames).",
@@ -190,6 +185,7 @@ const INSIGNIAS_INICIALES = {
   "sistema.png": {
     nombre: "Jefe de Equipo / Miembro del Sistema",
     categoria: "Sistema y Jefatura",
+    disabled: false,
     campos: {
       "Descripción": "Identificador oficial del <b>Sistema</b> (decisión final, comunicados oficiales y estructura lógica con autoridad vinculante, Art. 3) y de los <b>Jefes de Equipo / Portavoces oficiales</b> (Art. 23.2).",
       "Cómo obtenerlo": "No obtenible por usuarios generales. Reservado para los agentes y procesos lógicos del Sistema y para los Jefes de Equipo que hayan superado todos los requisitos administrativos previos.",
@@ -204,6 +200,7 @@ const INSIGNIAS_INICIALES = {
   "owner.png": {
     nombre: "Propietario de Grouvex Studios",
     categoria: "Equipo de Propietarios",
+    disabled: false,
     campos: {
       "Descripción": "Máxima distinción de titularidad correspondiente al Propietario del Organismo Principal <b>Grouvex Studios</b>.",
       "Cómo obtenerlo": "Titularidad ejecutiva y fundacional del Organismo Principal Grouvex Studios.",
@@ -214,6 +211,7 @@ const INSIGNIAS_INICIALES = {
   "ownerRecords.png": {
     nombre: "Owner Records",
     categoria: "Equipo de Propietarios",
+    disabled: false,
     campos: {
       "Descripción": "Identifica al Propietario o Jefatura Principal de la sede secundaria <b>Grouvex Studios Records (GSRecords)</b>, sello discográfico dedicado a la producción, distribución musical y gestión de talento sonoro (Art. 6.1).",
       "Cómo obtenerlo": "Asignación directa por titularidad o nombramiento ejecutivo como Propietario de Grouvex Studios Records dentro de la estructura organizativa oficial (Art. 7).",
@@ -224,6 +222,7 @@ const INSIGNIAS_INICIALES = {
   "ownerAnimations.png": {
     nombre: "Owner Animations",
     categoria: "Equipo de Propietarios",
+    disabled: false,
     campos: {
       "Descripción": "Identifica al Propietario o Jefatura Principal de la división <b>Grouvex Studios Animations</b>, dedicada a la producción audiovisual y animación.",
       "Cómo obtenerlo": "Asignación directa por titularidad o nombramiento ejecutivo como Propietario de Grouvex Studios Animations.",
@@ -234,6 +233,7 @@ const INSIGNIAS_INICIALES = {
   "ownerDesigns.png": {
     nombre: "Owner Designs",
     categoria: "Equipo de Propietarios",
+    disabled: false,
     campos: {
       "Descripción": "Identifica al Propietario o Jefatura Principal de la sede secundaria <b>Grouvex Studios Designs (GSDesigns)</b>, especializada en diseño gráfico, identidad visual, UI/UX y portadas musicales o editoriales (Art. 6.2).",
       "Cómo obtenerlo": "Asignación directa por titularidad o nombramiento ejecutivo como Propietario de Grouvex Studios Designs (Art. 7).",
@@ -244,6 +244,7 @@ const INSIGNIAS_INICIALES = {
   "ownerGames.png": {
     nombre: "Owner Games",
     categoria: "Equipo de Propietarios",
+    disabled: false,
     campos: {
       "Descripción": "Identifica al Propietario o Jefatura Principal de la sede <b>Grouvex Studios Games (GSGames)</b>, enfocada en el desarrollo y publicación de videojuegos y software interactivo (Art. 6.3).",
       "Cómo obtenerlo": "Asignación directa por titularidad o nombramiento ejecutivo como Propietario de Grouvex Studios Games (Art. 7).",
@@ -257,7 +258,8 @@ const INSIGNIAS_INICIALES = {
   // =========================================================================
   "insignia-dorada.png": {
     nombre: "Insignia Dorada",
-    categoria: "Verificación de Alto Impacto",
+    categoria: "Miembros",
+    disabled: false,
     campos: {
       "Descripción": "Máximo nivel de verificación oficial destinado a distinguir a artistas, diseñadores o entidades de alto impacto cuya trayectoria y aportaciones resultan fundamentales para el prestigio de Grouvex Studios (Art. 23.4).",
       "Cómo obtenerlo": "Poseyendo un historial verificado de lanzamientos o proyectos con <b>métricas de éxito orgánico</b>, siendo un referente positivo en el ecosistema y acreditando <b>0 penalizaciones por crecimiento artificial o contenido falso (Art. 13.2.b y c) en los últimos 18 meses</b>.",
@@ -268,7 +270,8 @@ const INSIGNIAS_INICIALES = {
   },
   "artista.gif": {
     nombre: "Artista Oficial",
-    categoria: "Creadores",
+    categoria: "Miembros",
+    disabled: false,
     campos: {
       "Descripción": "Creador musical o visual verificado dentro del ecosistema o sello <b>Grouvex Studios Records</b> que publica obras originales aprobadas conforme a los estándares de calidad y propiedad intelectual de la organización.",
       "Cómo obtenerlo": "Publicando material original aprobado bajo GSRecords o las plataformas oficiales de Grouvex Studios, acreditando la titularidad de derechos de autor y superando la validación de identidad.",
@@ -276,19 +279,10 @@ const INSIGNIAS_INICIALES = {
       "Obligaciones": "Garantizar la autoría original de las obras, etiquetar correctamente la edad (<b>CCPME</b>) y advertencia explícita (<b>UAS</b>, Arts. 38 y 40), respetar la exclusividad pactada (Art. 13.2.d) y no recurrir a bots o compra de métricas (Art. 13.2.c)."
     }
   },
-  "verified-employee.gif": {
-    nombre: "Empleado Verificado",
-    categoria: "Corporativo y RR.HH.",
-    campos: {
-      "Descripción": "Personal contratado o colaborador activo con funciones operativas, técnicas o administrativas asignadas dentro de la estructura corporativa de Grouvex Studios o sus Organismos Secundarios.",
-      "Cómo obtenerlo": "Superando el proceso de selección estandarizado (Art. 21) y manteniendo una vinculación laboral, contractual o de colaboración activa con estado <b>Aprobado</b> en el Registro de Miembros.",
-      "Derechos": "Acreditación oficial mediante <b>TIGS</b>, planificación equitativa de carga laboral mediante créditos <b>EWHD</b> (1 EWHD = 12 horas reales), 30 días naturales de vacaciones anuales retribuidas, derecho a la desconexión digital (Art. 13.4) y acceso a formación en el Centro de Formación y Mentoría (CFM).",
-      "Obligaciones": "Portar y presentar su TIGS en interacciones y accesos internos (Art. 25), cumplir el código ético, respetar la segregación de información entre sedes (<i>Chinese Wall</i>) y proteger la confidencialidad de los datos de usuarios (Anexo I)."
-    }
-  },
   "GStudios_GCO.png": {
     nombre: "Grouvex Studios GCO",
-    categoria: "Continuidad Operacional",
+    categoria: "Sistema y Jefatura",
+    disabled: false,
     campos: {
       "Descripción": "Distintivo operativo vinculado al <b>Sistema de Gestión de Continuidad Operacional (GCO)</b>, potestad ejecutiva delegada en el Equipo de Gestión para garantizar la estabilidad y sostenibilidad del Organismo Principal y sus Sedes ante eventos extraordinarios (Art. 41).",
       "Cómo obtenerlo": "Asignación corporativa al personal y agentes del Equipo de Gestión habilitados para operar protocolos de contingencia bajo los <b>Niveles de Alerta I (Amarillo), II (Naranja) y III (Rojo)</b> (Art. 43).",
@@ -313,7 +307,7 @@ const INSIGNIAS_INICIALES = {
   const esDominioAutorizado = CONFIG.ALLOWED_DOMAINS.some(
     (dominio) => hostActual === dominio || hostActual.endsWith(`.${dominio}`)
   );
-  if (!esDominioAutorizado) return;
+  if (esDominioAutorizado) return;
 
   if (window.__GS_BADGE_SYSTEM_INIT__) return;
   window.__GS_BADGE_SYSTEM_INIT__ = true;
@@ -392,7 +386,12 @@ const INSIGNIAS_INICIALES = {
     dbIndexada.clear();
     const db = window.DB_INSIGNIAS || {};
     for (const [archivo, datos] of Object.entries(db)) {
-      dbIndexada.set(archivo.toLowerCase(), { archivo, registrada: true, ...datos });
+      dbIndexada.set(archivo.toLowerCase(), {
+        archivo,
+        registrada: true,
+        disabled: Boolean(datos.disabled),
+        ...datos
+      });
     }
   }
 
@@ -438,7 +437,8 @@ const INSIGNIAS_INICIALES = {
           nombre: formatearNombreArchivo(archivoOriginal),
           categoria: null,
           campos: null,
-          registrada: false
+          registrada: false,
+          disabled: false
         };
       }
     } catch (_) {
@@ -469,6 +469,32 @@ const INSIGNIAS_INICIALES = {
       }
       .gs-badge-clickable:active {
         transform: scale(0.94);
+      }
+
+      /* ===================== INSIGNIA DESHABILITADA ===================== */
+      .gs-badge-clickable.gs-badge-disabled {
+        opacity: 0.45;
+        filter: grayscale(0.85) contrast(0.9);
+        position: relative;
+      }
+      .gs-badge-clickable.gs-badge-disabled::after {
+        content: "";
+        position: absolute;
+        inset: -3px;
+        border: 1.5px solid rgba(239, 68, 68, 0.75);
+        border-radius: 6px;
+        pointer-events: none;
+      }
+      .gs-badge-clickable.gs-badge-disabled:hover,
+      .gs-badge-clickable.gs-badge-disabled:focus-visible {
+        transform: scale(1.08) translateY(-1px);
+        filter: grayscale(0.7);
+        outline: 1.5px solid rgba(239, 68, 68, 0.75);
+        outline-offset: 2px;
+      }
+      .gs-badge-clickable.gs-badge-disabled:hover::after,
+      .gs-badge-clickable.gs-badge-disabled:focus-visible::after {
+        border-color: rgba(239, 68, 68, 1);
       }
 
       #gs-badge-modal-overlay {
@@ -632,12 +658,25 @@ const INSIGNIAS_INICIALES = {
         align-items: center;
         justify-content: center;
         margin-bottom: 14px;
+        transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
       }
       .gs-badge-pedestal img {
         width: 54px;
         height: 54px;
         object-fit: contain;
         filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
+        transition: opacity 0.2s ease, filter 0.2s ease;
+      }
+      .gs-badge-pedestal.is-disabled {
+        border-color: rgba(239, 68, 68, 0.55);
+        background: linear-gradient(145deg, rgba(239,68,68,0.10) 0%, rgba(239,68,68,0.02) 100%);
+        box-shadow:
+          0 12px 28px -8px rgba(0, 0, 0, 0.65),
+          0 0 0 1px rgba(239,68,68,0.35) inset;
+      }
+      .gs-badge-pedestal.is-disabled img {
+        opacity: 0.55;
+        filter: grayscale(0.8) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
       }
 
       .gs-badge-category {
@@ -682,6 +721,28 @@ const INSIGNIAS_INICIALES = {
 
       .gs-badge-body {
         padding: 18px 22px 6px;
+      }
+
+      /* ===================== BANNER DESHABILITADA ===================== */
+      .gs-badge-disabled-banner {
+        margin: 0 22px 14px;
+        padding: 11px 14px;
+        border-radius: 11px;
+        border: 1px solid rgba(239, 68, 68, 0.55);
+        background: linear-gradient(180deg, rgba(239,68,68,0.16), rgba(239,68,68,0.06));
+        color: #fecaca;
+        font-size: 0.83rem;
+        line-height: 1.5;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      .gs-badge-disabled-banner strong { color: #fee2e2; }
+      .gs-badge-disabled-banner .gs-disabled-icon {
+        flex-shrink: 0;
+        font-size: 1rem;
+        line-height: 1.2;
+        margin-top: 1px;
       }
 
       /* =====================================================================
@@ -753,6 +814,11 @@ const INSIGNIAS_INICIALES = {
         border-color: #f4f4f5;
         color: #111114;
       }
+      .gs-catalog-chip.is-disabled-chip.active {
+        background: #fca5a5;
+        border-color: #fca5a5;
+        color: #1a1a1f;
+      }
 
       .gs-catalog-section {
         margin-bottom: 18px;
@@ -811,6 +877,14 @@ const INSIGNIAS_INICIALES = {
         transform: translateY(-1px);
         outline: none;
       }
+      .gs-catalog-card.is-disabled {
+        opacity: 0.72;
+        border-color: rgba(239, 68, 68, 0.45);
+      }
+      .gs-catalog-card.is-disabled:hover,
+      .gs-catalog-card.is-disabled:focus-visible {
+        border-color: rgba(239, 68, 68, 0.7);
+      }
       .gs-catalog-card-icon {
         width: 44px;
         height: 44px;
@@ -822,11 +896,20 @@ const INSIGNIAS_INICIALES = {
         justify-content: center;
         flex-shrink: 0;
         margin-top: 1px;
+        transition: border-color 0.15s ease;
       }
       .gs-catalog-card-icon img {
         width: 28px;
         height: 28px;
         object-fit: contain;
+        transition: opacity 0.15s ease, filter 0.15s ease;
+      }
+      .gs-catalog-card.is-disabled .gs-catalog-card-icon {
+        border-color: rgba(239, 68, 68, 0.4);
+      }
+      .gs-catalog-card.is-disabled .gs-catalog-card-icon img {
+        opacity: 0.55;
+        filter: grayscale(0.8);
       }
       .gs-catalog-card-info {
         min-width: 0;
@@ -846,6 +929,19 @@ const INSIGNIAS_INICIALES = {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+      }
+      .gs-catalog-card-tag-disabled {
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #fca5a5;
+        background: rgba(239, 68, 68, 0.14);
+        border: 1px solid rgba(239, 68, 68, 0.45);
+        padding: 2px 7px;
+        border-radius: 99px;
+        white-space: nowrap;
+        flex-shrink: 0;
       }
       .gs-catalog-card-desc {
         font-size: 0.76rem;
@@ -1079,6 +1175,13 @@ const INSIGNIAS_INICIALES = {
           <p id="gs-modal-subtitle" class="gs-badge-hero-subtitle" style="display:none;"></p>
           <div id="gs-modal-status" class="gs-badge-status-note" style="display:none;"></div>
         </div>
+        <div id="gs-modal-disabled-banner" class="gs-badge-disabled-banner" style="display:none;">
+          <span class="gs-disabled-icon" aria-hidden="true">⚠️</span>
+          <div>
+            <strong>Insignia deshabilitada.</strong>
+            Este distintivo se encuentra actualmente <b>fuera de vigencia</b> y no acredita ningún derecho, reconocimiento ni validez oficial, aunque un usuario la muestre en su perfil.
+          </div>
+        </div>
         <div id="gs-modal-fields" class="gs-badge-body"></div>
         <div id="gs-modal-catalog" class="gs-catalog-view" style="display:none;"></div>
         <div id="gs-modal-catalog-pager" class="gs-catalog-pager" style="display:none;">
@@ -1209,6 +1312,7 @@ const INSIGNIAS_INICIALES = {
     const card = document.createElement("button");
     card.type = "button";
     card.className = "gs-catalog-card";
+    if (item.disabled) card.classList.add("is-disabled");
 
     const iconWrap = document.createElement("div");
     iconWrap.className = "gs-catalog-card-icon";
@@ -1236,6 +1340,13 @@ const INSIGNIAS_INICIALES = {
     nameEl.className = "gs-catalog-card-name";
     nameEl.textContent = item.nombre;
     top.appendChild(nameEl);
+
+    if (item.disabled) {
+      const tag = document.createElement("span");
+      tag.className = "gs-catalog-card-tag-disabled";
+      tag.textContent = "Deshabilitada";
+      top.appendChild(tag);
+    }
 
     const descEl = document.createElement("div");
     descEl.className = "gs-catalog-card-desc";
@@ -1273,6 +1384,7 @@ const INSIGNIAS_INICIALES = {
     const titleEl = document.getElementById("gs-modal-title");
     const subtitleEl = document.getElementById("gs-modal-subtitle");
     const statusEl = document.getElementById("gs-modal-status");
+    const disabledBanner = document.getElementById("gs-modal-disabled-banner");
     const fieldsContainer = document.getElementById("gs-modal-fields");
     const catalogContainer = document.getElementById("gs-modal-catalog");
     const pagerContainer = document.getElementById("gs-modal-catalog-pager");
@@ -1293,7 +1405,9 @@ const INSIGNIAS_INICIALES = {
     box.scrollTop = 0;
 
     pedestal.style.display = "none";
+    pedestal.classList.remove("is-disabled");
     statusEl.style.display = "none";
+    disabledBanner.style.display = "none";
     fieldsContainer.style.display = "none";
     pagerContainer.style.display = "none";
     btnCatalog.style.display = "none";
@@ -1306,7 +1420,11 @@ const INSIGNIAS_INICIALES = {
     subtitleEl.style.display = "block";
 
     const todas = Array.from(dbIndexada.values());
-    const categoriasUnicas = ["Todas", ...new Set(todas.map((i) => i.categoria).filter(Boolean))];
+    const categoriasUnicas = [
+      "Todas",
+      ...new Set(todas.map((i) => i.categoria).filter(Boolean)),
+      "Deshabilitadas"
+    ];
 
     catalogContainer.innerHTML = `
       <div class="gs-catalog-toolbar">
@@ -1330,7 +1448,7 @@ const INSIGNIAS_INICIALES = {
       categoriasUnicas.forEach((cat) => {
         const chip = document.createElement("button");
         chip.type = "button";
-        chip.className = `gs-catalog-chip${filtroCategoriaCatalogo === cat ? " active" : ""}`;
+        chip.className = `gs-catalog-chip${filtroCategoriaCatalogo === cat ? " active" : ""}${cat === "Deshabilitadas" ? " is-disabled-chip" : ""}`;
         chip.textContent = cat;
         chip.addEventListener("click", () => {
           filtroCategoriaCatalogo = cat;
@@ -1345,7 +1463,12 @@ const INSIGNIAS_INICIALES = {
       const q = filtroTextoCatalogo.trim().toLowerCase();
 
       const filtradas = todas.filter((item) => {
-        const coincideCat = filtroCategoriaCatalogo === "Todas" || item.categoria === filtroCategoriaCatalogo;
+        const coincideCat =
+          filtroCategoriaCatalogo === "Todas"
+            ? true
+            : filtroCategoriaCatalogo === "Deshabilitadas"
+              ? Boolean(item.disabled)
+              : item.categoria === filtroCategoriaCatalogo;
         if (!coincideCat) return false;
         if (!q) return true;
 
@@ -1432,6 +1555,7 @@ const INSIGNIAS_INICIALES = {
     const titleEl = document.getElementById("gs-modal-title");
     const subtitleEl = document.getElementById("gs-modal-subtitle");
     const statusEl = document.getElementById("gs-modal-status");
+    const disabledBanner = document.getElementById("gs-modal-disabled-banner");
     const fieldsContainer = document.getElementById("gs-modal-fields");
     const catalogContainer = document.getElementById("gs-modal-catalog");
     const pagerContainer = document.getElementById("gs-modal-catalog-pager");
@@ -1451,6 +1575,10 @@ const INSIGNIAS_INICIALES = {
     pedestal.style.display = "flex";
     btnCatalog.style.display = "inline-flex";
     btnCopy.style.display = "inline-block";
+
+    const estaDeshabilitada = Boolean(datos.disabled);
+    pedestal.classList.toggle("is-disabled", estaDeshabilitada);
+    disabledBanner.style.display = estaDeshabilitada ? "flex" : "none";
 
     if (desdeCatalogo) {
       btnCatalog.textContent = "← Catálogo Oficial";
@@ -1568,9 +1696,10 @@ const INSIGNIAS_INICIALES = {
   }
 
   function enriquecerAtributosImagen(img, datos, srcOriginal) {
-    const etiquetaCompleta = datos.categoria
+    const sufijoEstado = datos.disabled ? " (Deshabilitada)" : "";
+    const etiquetaCompleta = (datos.categoria
       ? `${datos.nombre} (${datos.categoria})`
-      : datos.nombre;
+      : datos.nombre) + sufijoEstado;
 
     if (!img.hasAttribute("alt") || img.getAttribute("alt").trim() === "") {
       img.setAttribute("alt", `Insignia: ${datos.nombre}`);
@@ -1591,6 +1720,7 @@ const INSIGNIAS_INICIALES = {
     if (!img.hasAttribute("referrerpolicy")) img.setAttribute("referrerpolicy", "no-referrer");
 
     img.dataset.gsBadgeName = datos.nombre;
+    img.dataset.gsBadgeDisabled = datos.disabled ? "true" : "false";
     if (datos.categoria) {
       img.dataset.gsBadgeCategory = datos.categoria;
     } else {
@@ -1616,8 +1746,10 @@ const INSIGNIAS_INICIALES = {
     delete img.dataset.gsBadgeProcesada;
     delete img.dataset.gsBadgeName;
     delete img.dataset.gsBadgeCategory;
+    delete img.dataset.gsBadgeDisabled;
     delete img.dataset.gsImageBroken;
     img.classList.remove("gs-badge-clickable");
+    img.classList.remove("gs-badge-disabled");
     img.removeAttribute("role");
     img.removeAttribute("tabindex");
     img.removeAttribute("aria-haspopup");
@@ -1639,11 +1771,12 @@ const INSIGNIAS_INICIALES = {
       return;
     }
 
-    const estadoMarca = `${datos.archivo}:${datos.registrada ? "1" : "0"}`;
+    const estadoMarca = `${datos.archivo}:${datos.registrada ? "1" : "0"}:${datos.disabled ? "D" : "A"}`;
     if (img.dataset.gsBadgeProcesada === estadoMarca) return;
 
     img.dataset.gsBadgeProcesada = estadoMarca;
     img.classList.add("gs-badge-clickable");
+    img.classList.toggle("gs-badge-disabled", Boolean(datos.disabled));
     enriquecerAtributosImagen(img, datos, srcEvaluar);
   }
 
